@@ -26,5 +26,8 @@ export interface Trip extends EntityTimestamps {
   status: TripStatus
 
   notes?: string
+
+  startedAt?: string
   completedAt?: string
+  cancelledAt?: string
 }
