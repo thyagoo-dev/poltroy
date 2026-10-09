@@ -17,11 +17,15 @@ import type {
   SeatId,
 } from '@/features/seat-map/domain/ids'
 
-const busId = 'bus-1' as BusId
-const layoutId = 'layout-1' as BusLayoutId
+const busId =
+  'bus-1' as BusId
+
+const layoutId =
+  'layout-1' as BusLayoutId
 
 function createLayout(
-  elements: BusLayout['elements'],
+  elements:
+    BusLayout['elements'],
 ): BusLayout {
   return {
     id: layoutId,
@@ -32,144 +36,266 @@ function createLayout(
 
     elements,
 
-    createdAt: '2026-10-09T00:00:00.000Z',
-    updatedAt: '2026-10-09T00:00:00.000Z',
+    createdAt:
+      '2026-10-09T00:00:00.000Z',
+
+    updatedAt:
+      '2026-10-09T00:00:00.000Z',
   }
 }
 
-describe('validateBusLayout', () => {
-  it('aceita um layout básico válido', () => {
-    const layout = createLayout([
-      {
-        id: 'seat-1' as SeatId,
-        kind: 'seat',
-        seatNumber: '01',
-        seatType: 'STANDARD',
-        position: {
-          deck: 1,
-          row: 1,
-          column: 1,
-        },
-      },
-      {
-        id: 'driver-1' as LayoutElementId,
-        kind: 'driver',
-        position: {
-          deck: 1,
-          row: 1,
-          column: 4,
-        },
-      },
-    ])
+describe(
+  'validateBusLayout',
+  () => {
+    it(
+      'aceita um layout básico válido',
+      () => {
+        const layout =
+          createLayout([
+            {
+              id: 'seat-1' as SeatId,
 
-    expect(validateBusLayout(layout)).toEqual([])
-  })
+              kind: 'seat',
 
-  it('detecta números de assento duplicados', () => {
-    const layout = createLayout([
-      {
-        id: 'seat-1' as SeatId,
-        kind: 'seat',
-        seatNumber: '01',
-        seatType: 'STANDARD',
-        position: {
-          deck: 1,
-          row: 1,
-          column: 1,
-        },
-      },
-      {
-        id: 'seat-2' as SeatId,
-        kind: 'seat',
-        seatNumber: '01',
-        seatType: 'STANDARD',
-        position: {
-          deck: 1,
-          row: 2,
-          column: 1,
-        },
-      },
-    ])
+              seatNumber: '01',
+              seatType: 'STANDARD',
 
-    expect(validateBusLayout(layout)).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          code: 'DUPLICATE_SEAT_NUMBER',
-        }),
-      ]),
+              position: {
+                deck: 1,
+                row: 1,
+                column: 1,
+              },
+            },
+
+            {
+              id: 'driver-1' as LayoutElementId,
+
+              kind: 'driver',
+
+              position: {
+                deck: 1,
+                row: 1,
+                column: 4,
+              },
+            },
+          ])
+
+        expect(
+          validateBusLayout(
+            layout,
+          ),
+        ).toEqual([])
+      },
     )
-  })
 
-  it('detecta identificação de elemento duplicada', () => {
-    const duplicatedId =
-      'element-1' as LayoutElementId
+    it(
+      'detecta números de assento duplicados',
+      () => {
+        const layout =
+          createLayout([
+            {
+              id: 'seat-1' as SeatId,
 
-    const layout = createLayout([
-      {
-        id: duplicatedId,
-        kind: 'driver',
-        position: {
-          deck: 1,
-          row: 1,
-          column: 4,
-        },
+              kind: 'seat',
+
+              seatNumber: '01',
+              seatType: 'STANDARD',
+
+              position: {
+                deck: 1,
+                row: 1,
+                column: 1,
+              },
+            },
+
+            {
+              id: 'seat-2' as SeatId,
+
+              kind: 'seat',
+
+              seatNumber: '01',
+              seatType: 'STANDARD',
+
+              position: {
+                deck: 1,
+                row: 2,
+                column: 1,
+              },
+            },
+          ])
+
+        expect(
+          validateBusLayout(
+            layout,
+          ),
+        ).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              code:
+                'DUPLICATE_SEAT_NUMBER',
+            }),
+          ]),
+        )
       },
-      {
-        id: duplicatedId,
-        kind: 'door',
-        position: {
-          deck: 1,
-          row: 2,
-          column: 4,
-        },
+    )
+
+    it(
+      'detecta identificação de elemento duplicada',
+      () => {
+        const duplicatedId =
+          'element-1' as LayoutElementId
+
+        const layout =
+          createLayout([
+            {
+              id: duplicatedId,
+
+              kind: 'driver',
+
+              position: {
+                deck: 1,
+                row: 1,
+                column: 4,
+              },
+            },
+
+            {
+              id: duplicatedId,
+
+              kind: 'door',
+
+              position: {
+                deck: 1,
+                row: 2,
+                column: 4,
+              },
+            },
+          ])
+
+        expect(
+          validateBusLayout(
+            layout,
+          ),
+        ).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              code:
+                'DUPLICATE_ELEMENT_ID',
+            }),
+          ]),
+        )
       },
-    ])
-
-    expect(validateBusLayout(layout)).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          code: 'DUPLICATE_ELEMENT_ID',
-        }),
-      ]),
     )
-  })
 
-  it('detecta posições inválidas no grid', () => {
-    const layout = createLayout([
-      {
-        id: 'seat-1' as SeatId,
-        kind: 'seat',
-        seatNumber: '01',
-        seatType: 'STANDARD',
-        position: {
-          deck: 0,
-          row: 1,
-          column: 1,
-        },
+    it(
+      'detecta posições inválidas no grid',
+      () => {
+        const layout =
+          createLayout([
+            {
+              id: 'seat-1' as SeatId,
+
+              kind: 'seat',
+
+              seatNumber: '01',
+              seatType: 'STANDARD',
+
+              position: {
+                deck: 0,
+                row: 1,
+                column: 1,
+              },
+            },
+          ])
+
+        expect(
+          validateBusLayout(
+            layout,
+          ),
+        ).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              code:
+                'INVALID_GRID_POSITION',
+            }),
+          ]),
+        )
       },
-    ])
-
-    expect(validateBusLayout(layout)).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          code: 'INVALID_GRID_POSITION',
-        }),
-      ]),
     )
-  })
 
-  it('detecta versão inválida', () => {
-    const layout: BusLayout = {
-      ...createLayout([]),
-      version: 0,
-    }
+    it(
+      'detecta versão inválida',
+      () => {
+        const layout:
+          BusLayout = {
+          ...createLayout([]),
+          version: 0,
+        }
 
-    expect(validateBusLayout(layout)).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          code: 'INVALID_VERSION',
-        }),
-      ]),
+        expect(
+          validateBusLayout(
+            layout,
+          ),
+        ).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              code:
+                'INVALID_VERSION',
+            }),
+          ]),
+        )
+      },
     )
-  })
-})
+
+    it(
+      'detecta elementos ocupando a mesma célula',
+      () => {
+        const layout =
+          createLayout([
+            {
+              id: 'seat-1' as SeatId,
+
+              kind: 'seat',
+
+              seatNumber: '01',
+              seatType: 'STANDARD',
+
+              position: {
+                deck: 1,
+                row: 2,
+                column: 1,
+              },
+            },
+
+            {
+              id: 'seat-2' as SeatId,
+
+              kind: 'seat',
+
+              seatNumber: '02',
+              seatType: 'STANDARD',
+
+              position: {
+                deck: 1,
+                row: 2,
+                column: 1,
+              },
+            },
+          ])
+
+        expect(
+          validateBusLayout(
+            layout,
+          ),
+        ).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              code:
+                'GRID_COLLISION',
+            }),
+          ]),
+        )
+      },
+    )
+  },
+)

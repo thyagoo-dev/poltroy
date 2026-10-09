@@ -3,16 +3,19 @@ import type {
   BusLayoutId,
 } from '@/features/buses/domain/ids'
 import type { BusLayoutElement } from '@/features/seat-map/domain/layout-element'
+import { findLayoutCollisions } from '@/features/seat-map/domain/layout-engine'
 import type { EntityTimestamps } from '@/shared/domain/entity'
 
-export interface BusLayout extends EntityTimestamps {
+export interface BusLayout
+  extends EntityTimestamps {
   id: BusLayoutId
   busId: BusId
 
   name: string
   version: number
 
-  elements: readonly BusLayoutElement[]
+  elements:
+    readonly BusLayoutElement[]
 }
 
 export type BusLayoutValidationIssueCode =
@@ -22,38 +25,65 @@ export type BusLayoutValidationIssueCode =
   | 'DUPLICATE_SEAT_NUMBER'
   | 'INVALID_GRID_POSITION'
   | 'INVALID_GRID_SPAN'
+  | 'GRID_COLLISION'
 
 export interface BusLayoutValidationIssue {
   code: BusLayoutValidationIssueCode
   message: string
 }
 
-function isPositiveInteger(value: number) {
-  return Number.isInteger(value) && value >= 1
+function isPositiveInteger(
+  value: number,
+) {
+  return (
+    Number.isInteger(value) &&
+    value >= 1
+  )
 }
 
 export function validateBusLayout(
   layout: BusLayout,
 ): readonly BusLayoutValidationIssue[] {
-  const issues: BusLayoutValidationIssue[] = []
+  const issues:
+    BusLayoutValidationIssue[] =
+    []
 
-  if (!isPositiveInteger(layout.version)) {
+  if (
+    !isPositiveInteger(
+      layout.version,
+    )
+  ) {
     issues.push({
       code: 'INVALID_VERSION',
-      message: 'A versão do layout deve ser um inteiro positivo.',
+      message:
+        'A versão do layout deve ser um inteiro positivo.',
     })
   }
 
-  const elementIds = new Set<string>()
-  const seatNumbers = new Set<string>()
+  const elementIds =
+    new Set<string>()
 
-  for (const element of layout.elements) {
-    const elementId = String(element.id)
+  const seatNumbers =
+    new Set<string>()
 
-    if (elementIds.has(elementId)) {
+  for (
+    const element of
+      layout.elements
+  ) {
+    const elementId =
+      String(element.id)
+
+    if (
+      elementIds.has(
+        elementId,
+      )
+    ) {
       issues.push({
-        code: 'DUPLICATE_ELEMENT_ID',
-        message: `O elemento "${elementId}" está duplicado no layout.`,
+        code:
+          'DUPLICATE_ELEMENT_ID',
+
+        message:
+          `O elemento "${elementId}" está duplicado no layout.`,
       })
     }
 
@@ -68,52 +98,118 @@ export function validateBusLayout(
     } = element.position
 
     if (
-      !isPositiveInteger(deck) ||
-      !isPositiveInteger(row) ||
-      !isPositiveInteger(column)
+      !isPositiveInteger(
+        deck,
+      ) ||
+      !isPositiveInteger(
+        row,
+      ) ||
+      !isPositiveInteger(
+        column,
+      )
     ) {
       issues.push({
-        code: 'INVALID_GRID_POSITION',
-        message: `O elemento "${elementId}" possui uma posição inválida.`,
+        code:
+          'INVALID_GRID_POSITION',
+
+        message:
+          `O elemento "${elementId}" possui uma posição inválida.`,
       })
     }
 
     if (
-      (rowSpan !== undefined &&
-        !isPositiveInteger(rowSpan)) ||
-      (columnSpan !== undefined &&
-        !isPositiveInteger(columnSpan))
+      (
+        rowSpan !==
+          undefined &&
+        !isPositiveInteger(
+          rowSpan,
+        )
+      ) ||
+      (
+        columnSpan !==
+          undefined &&
+        !isPositiveInteger(
+          columnSpan,
+        )
+      )
     ) {
       issues.push({
-        code: 'INVALID_GRID_SPAN',
-        message: `O elemento "${elementId}" possui uma dimensão inválida.`,
+        code:
+          'INVALID_GRID_SPAN',
+
+        message:
+          `O elemento "${elementId}" possui uma dimensão inválida.`,
       })
     }
 
-    if (element.kind !== 'seat') {
+    if (
+      element.kind !==
+      'seat'
+    ) {
       continue
     }
 
     const normalizedSeatNumber =
-      element.seatNumber.trim().toLowerCase()
+      element.seatNumber
+        .trim()
+        .toLowerCase()
 
-    if (!normalizedSeatNumber) {
+    if (
+      !normalizedSeatNumber
+    ) {
       issues.push({
-        code: 'EMPTY_SEAT_NUMBER',
-        message: `O assento "${elementId}" precisa possuir identificação.`,
+        code:
+          'EMPTY_SEAT_NUMBER',
+
+        message:
+          `O assento "${elementId}" precisa possuir identificação.`,
       })
 
       continue
     }
 
-    if (seatNumbers.has(normalizedSeatNumber)) {
+    if (
+      seatNumbers.has(
+        normalizedSeatNumber,
+      )
+    ) {
       issues.push({
-        code: 'DUPLICATE_SEAT_NUMBER',
-        message: `O assento "${element.seatNumber}" está duplicado no layout.`,
+        code:
+          'DUPLICATE_SEAT_NUMBER',
+
+        message:
+          `O assento "${element.seatNumber}" está duplicado no layout.`,
       })
     }
 
-    seatNumbers.add(normalizedSeatNumber)
+    seatNumbers.add(
+      normalizedSeatNumber,
+    )
+  }
+
+  const collisions =
+    findLayoutCollisions(
+      layout.elements,
+    )
+
+  for (
+    const collision of
+      collisions
+  ) {
+    issues.push({
+      code:
+        'GRID_COLLISION',
+
+      message:
+        `Os elementos ${collision.elementIds
+          .map(
+            (id) =>
+              `"${id}"`,
+          )
+          .join(
+            ', ',
+          )} ocupam a mesma célula no deck ${collision.cell.deck}, linha ${collision.cell.row}, coluna ${collision.cell.column}.`,
+    })
   }
 
   return issues
