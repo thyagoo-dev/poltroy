@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { getBusAction, getBusLayoutAction } from '@/app/services/bus-actions'
+import { listPassengersAction } from '@/app/services/passenger-actions'
+import type { Passenger } from '@/features/passengers/domain/passenger'
 import { getTripAction, listTripSeatStatesAction } from '@/app/services/trip-actions'
 import type { BusLayout } from '@/features/buses/domain/bus-layout'
 import type { Bus } from '@/features/buses/domain/bus'
@@ -15,10 +17,12 @@ interface OperationalMapState {
   bus?: Bus
   layout?: BusLayout
   seatStates: readonly TripSeatState[]
+  passengers: readonly Passenger[]
   error: string | null
 }
 
 const emptySeatStates: readonly TripSeatState[] = []
+const emptyPassengers: readonly Passenger[] = []
 
 export function useOperationalTripMap() {
   const operationalTripId = useTripOperationStore((state) => state.operationalTripId)
@@ -40,10 +44,11 @@ export function useOperationalTripMap() {
         return
       }
 
-      const [bus, layout, seatStates] = await Promise.all([
+      const [bus, layout, seatStates, passengers] = await Promise.all([
         getBusAction(trip.busId),
         getBusLayoutAction(trip.layoutId),
         listTripSeatStatesAction(trip.id),
+        listPassengersAction(),
       ])
       if (cancelled) return
       setMapState({
@@ -52,6 +57,7 @@ export function useOperationalTripMap() {
         bus,
         layout,
         seatStates,
+        passengers,
         error: !bus
           ? 'O ônibus desta viagem não foi encontrado.'
           : !layout
@@ -65,6 +71,7 @@ export function useOperationalTripMap() {
         setMapState({
           id: tripId,
           seatStates: emptySeatStates,
+          passengers: emptyPassengers,
           error: 'Não foi possível carregar o mapa operacional.',
         })
       }
@@ -82,6 +89,7 @@ export function useOperationalTripMap() {
     bus: currentState?.bus,
     layout: currentState?.layout,
     seatStates: currentState?.seatStates ?? emptySeatStates,
+    passengers: currentState?.passengers ?? emptyPassengers,
     isLoading: Boolean(operationalTripId && !currentState),
     error: currentState?.error ?? null,
     refresh,

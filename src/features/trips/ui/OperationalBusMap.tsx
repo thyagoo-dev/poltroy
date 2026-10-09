@@ -4,6 +4,8 @@ import {
 } from 'react'
 
 import type { BusLayout } from '@/features/buses/domain/bus-layout'
+import type { PassengerId } from '@/features/passengers/domain/ids'
+import type { Passenger } from '@/features/passengers/domain/passenger'
 import type { SeatId } from '@/features/seat-map/domain/ids'
 import { BusMap } from '@/features/seat-map/ui/BusMap'
 import {
@@ -23,6 +25,8 @@ interface OperationalBusMapProps {
 
   states:
     readonly TripSeatState[]
+  passengers: readonly Passenger[]
+  onChangePassenger: (seatId: SeatId, passengerId: PassengerId | null) => Promise<void>
 
   onChangeStatus: (
     seatId: SeatId,
@@ -34,6 +38,8 @@ export function OperationalBusMap({
   trip,
   layout,
   states,
+  passengers,
+  onChangePassenger,
   onChangeStatus,
 }: OperationalBusMapProps) {
   const [
@@ -196,6 +202,19 @@ export function OperationalBusMap({
     }
   }
 
+  async function handlePassengerSelect(passengerId: PassengerId | null) {
+    if (!selectedSeat || isPending) return
+    setIsPending(true)
+    setError(null)
+    try {
+      await onChangePassenger(selectedSeat.id, passengerId)
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : 'Não foi possível alterar o passageiro.')
+    } finally {
+      setIsPending(false)
+    }
+  }
+
   return (
     <>
       <div
@@ -299,6 +318,9 @@ export function OperationalBusMap({
       />
 
       <SeatStatusSheet
+        passengers={passengers}
+        passengerId={selectedState?.passengerId}
+        onSelectPassenger={(passengerId) => void handlePassengerSelect(passengerId)}
         error={error}
         open={
           selectedSeat !==

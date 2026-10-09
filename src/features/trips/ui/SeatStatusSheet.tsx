@@ -5,6 +5,9 @@ import {
 } from 'react'
 
 import type { SeatStatus } from '@/features/trips/domain/trip-seat-state'
+import type { PassengerId } from '@/features/passengers/domain/ids'
+import type { Passenger } from '@/features/passengers/domain/passenger'
+import { SeatPassengerSection } from '@/features/trips/ui/SeatPassengerSection'
 import { seatStatusVisuals } from '@/features/trips/ui/seat-status-visuals'
 import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/Button'
@@ -19,6 +22,9 @@ interface SeatStatusSheetProps {
 
   isPending?: boolean
   error?: string | null
+  passengers: readonly Passenger[]
+  passengerId?: PassengerId
+  onSelectPassenger: (passengerId: PassengerId | null) => void
 
   onSelect: (
     status: SeatStatus,
@@ -41,6 +47,9 @@ export function SeatStatusSheet({
   currentStatus,
   isPending = false,
   error,
+  passengers,
+  passengerId,
+  onSelectPassenger,
   onSelect,
   onClose,
 }: SeatStatusSheetProps) {
@@ -95,7 +104,7 @@ export function SeatStatusSheet({
       }}
       className="
         m-0 mt-auto
-        w-full max-w-none max-h-dvh
+        w-full max-w-none max-h-dvh overflow-y-auto
         rounded-t-sheet
         border border-border
         bg-surface
@@ -214,6 +223,11 @@ export function SeatStatusSheet({
             },
           )}
         </div>
+
+        {open && (currentStatus === 'OCCUPIED' || currentStatus === 'RESERVED') && (
+          <SeatPassengerSection key={seatNumber} passengers={passengers} passengerId={passengerId}
+            isPending={isPending} onSelect={onSelectPassenger} />
+        )}
 
         {error && (
           <p role="alert" className="mt-4 rounded-control border border-danger/20 bg-danger/10 px-3 py-2.5 text-sm text-danger">

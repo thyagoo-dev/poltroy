@@ -29,12 +29,18 @@ import {
   type UpdateTripInput,
 } from '@/features/trips/application/update-trip'
 import type { TripId } from '@/features/trips/domain/ids'
+import { setTripSeatPassenger, type SetTripSeatPassengerInput } from '@/features/trips/application/set-trip-seat-passenger'
 import {
   busLayoutRepository,
   busRepository,
+  passengerRepository,
   tripRepository,
   tripSeatStateRepository,
 } from '@/infrastructure/repositories/repositories'
+
+export function setTripSeatPassengerAction(input: SetTripSeatPassengerInput) {
+  return setTripSeatPassenger(input, { tripRepository, tripSeatStateRepository, passengerRepository })
+}
 
 export function createTripAction(
   input: CreateTripInput,

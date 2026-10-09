@@ -7,7 +7,8 @@ import { Link } from 'react-router'
 
 import { useActiveBusLayout } from '@/app/hooks/use-active-bus-layout'
 import { useOperationalTripMap } from '@/app/hooks/use-operational-trip-map'
-import { setTripSeatStatusAction } from '@/app/services/trip-actions'
+import { setTripSeatPassengerAction, setTripSeatStatusAction } from '@/app/services/trip-actions'
+import type { PassengerId } from '@/features/passengers/domain/ids'
 import type { SeatId } from '@/features/seat-map/domain/ids'
 import { BusMap } from '@/features/seat-map/ui/BusMap'
 import type { SeatStatus } from '@/features/trips/domain/trip-seat-state'
@@ -53,6 +54,12 @@ export function MapPage() {
       : physicalMap.activeBus
         ? `Visualização estrutural de ${physicalMap.activeBus.name}.`
         : 'Selecione um ônibus para visualizar sua configuração.'
+
+  async function handleSeatPassengerChange(seatId: SeatId, passengerId: PassengerId | null) {
+    if (!operationalMap.trip) return
+    await setTripSeatPassengerAction({ tripId: operationalMap.trip.id, seatId, passengerId })
+    operationalMap.refresh()
+  }
 
   return (
     <div className="mx-auto w-full max-w-6xl">
@@ -232,6 +239,8 @@ export function MapPage() {
               padding="lg"
             >
               <OperationalBusMap
+                passengers={operationalMap.passengers}
+                onChangePassenger={handleSeatPassengerChange}
                 key={operationalMap.trip.id}
                 trip={
                   operationalMap.trip
