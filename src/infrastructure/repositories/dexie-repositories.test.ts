@@ -274,3 +274,29 @@ describe('Dexie repositories', () => {
     ).rejects.toThrow()
   })
 })
+
+describe('saveWithLayout', () => {
+  it('salva ônibus e layout na mesma transação', async () => {
+    const repository = new DexieBusRepository(database)
+
+    await repository.saveWithLayout(bus, layout)
+
+    expect(await database.buses.get(busId)).toEqual(bus)
+    expect(await database.busLayouts.get(layoutId)).toEqual(layout)
+  })
+
+  it('reverte o layout se a gravação do ônibus falhar', async () => {
+    const repository = new DexieBusRepository(database)
+    const invalidBus: Bus = {
+      ...bus,
+      id: undefined as unknown as BusId,
+    }
+
+    await expect(
+      repository.saveWithLayout(invalidBus, layout),
+    ).rejects.toThrow()
+
+    expect(await database.busLayouts.get(layoutId)).toBeUndefined()
+    expect(await database.buses.count()).toBe(0)
+  })
+})

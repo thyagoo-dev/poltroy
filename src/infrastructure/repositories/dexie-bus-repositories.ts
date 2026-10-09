@@ -33,6 +33,26 @@ export class DexieBusRepository
     await this.database.buses.put(bus)
   }
 
+  async saveWithLayout(
+    bus: Bus,
+    layout: BusLayout,
+  ): Promise<void> {
+    await this.database.transaction(
+      'rw',
+      [
+        this.database.buses,
+        this.database.busLayouts,
+      ],
+      async () => {
+        await this.database.busLayouts.put(
+          layout,
+        )
+
+        await this.database.buses.put(bus)
+      },
+    )
+  }
+
   async delete(id: BusId): Promise<void> {
     await this.database.buses.delete(id)
   }

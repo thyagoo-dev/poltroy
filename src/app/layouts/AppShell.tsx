@@ -2,37 +2,71 @@ import { useEffect } from 'react'
 import {
   BusFront,
   Circle,
+  ChevronDown,
 } from 'lucide-react'
 import {
+  Link,
   Outlet,
   useLocation,
 } from 'react-router'
 
+import { useActiveBus } from '@/app/hooks/use-active-bus'
 import {
   DesktopNavigation,
   MobileNavigation,
 } from '@/app/navigation/AppNavigation'
 import { navigationItems } from '@/app/navigation/navigation-items'
 
-function getCurrentNavigationItem(pathname: string) {
-  return navigationItems.find((item) => {
-    if (item.end) {
-      return pathname === item.path
-    }
+function getCurrentPageTitle(
+  pathname: string,
+) {
+  if (
+    pathname === '/buses' ||
+    pathname.startsWith(
+      '/buses/',
+    )
+  ) {
+    return 'Ônibus'
+  }
 
-    return pathname === item.path || pathname.startsWith(`${item.path}/`)
-  })
+  const currentNavigationItem =
+    navigationItems.find(
+      (item) => {
+        if (item.end) {
+          return (
+            pathname ===
+            item.path
+          )
+        }
+
+        return (
+          pathname ===
+            item.path ||
+          pathname.startsWith(
+            `${item.path}/`,
+          )
+        )
+      },
+    )
+
+  return (
+    currentNavigationItem?.label ??
+    'Poltroy'
+  )
 }
 
 export function AppShell() {
   const location = useLocation()
 
-  const currentNavigationItem = getCurrentNavigationItem(
-    location.pathname,
-  )
+  const {
+    activeBus,
+    isLoading,
+  } = useActiveBus()
 
   const currentPageTitle =
-    currentNavigationItem?.label ?? 'Poltroy'
+    getCurrentPageTitle(
+      location.pathname,
+    )
 
   useEffect(() => {
     document.title =
@@ -40,6 +74,12 @@ export function AppShell() {
         ? 'Poltroy'
         : `${currentPageTitle} · Poltroy`
   }, [currentPageTitle])
+
+  const activeBusLabel =
+    isLoading
+      ? 'Carregando...'
+      : activeBus?.name ??
+        'Nenhum ônibus'
 
   return (
     <div
@@ -134,7 +174,7 @@ export function AppShell() {
               mx-auto flex min-h-16
               w-full max-w-[100rem]
               items-center justify-between
-              gap-4
+              gap-3
               px-[var(--poltroy-space-page-inline)]
             "
           >
@@ -163,42 +203,55 @@ export function AppShell() {
               </h1>
             </div>
 
-            <div
+            <Link
+              to="/buses"
               className="
-                flex min-w-0 items-center gap-2.5
+                flex min-w-0
+                max-w-[13rem]
+                items-center gap-2.5
                 rounded-pill
                 border border-border
                 bg-surface
                 px-3 py-2
                 shadow-soft
+                transition-[border-color,background-color]
+                hover:border-border-strong
+                hover:bg-surface-raised
+                focus-visible:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-primary/55
+                sm:max-w-[18rem]
               "
-              aria-label="Nenhum ônibus selecionado"
+              aria-label={`Gerenciar ônibus. Selecionado: ${activeBusLabel}`}
             >
               <BusFront
                 aria-hidden="true"
-                className="shrink-0 text-subtle"
+                className={
+                  activeBus
+                    ? 'shrink-0 text-primary'
+                    : 'shrink-0 text-subtle'
+                }
                 size={17}
                 strokeWidth={1.8}
               />
 
               <span
                 className="
-                  hidden max-w-44 truncate
-                  text-xs font-medium text-muted
-                  sm:block
+                  min-w-0 flex-1
+                  truncate
+                  text-xs font-medium
+                  text-muted
                 "
               >
-                Nenhum ônibus
+                {activeBusLabel}
               </span>
 
-              <span
-                className="
-                  size-2 shrink-0 rounded-full
-                  bg-subtle
-                "
+              <ChevronDown
                 aria-hidden="true"
+                className="shrink-0 text-subtle"
+                size={14}
               />
-            </div>
+            </Link>
           </div>
         </header>
 

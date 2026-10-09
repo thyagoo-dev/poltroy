@@ -5,6 +5,7 @@ import {
 } from 'react-router'
 
 import { AppShell } from '@/app/layouts/AppShell'
+import { BusesPage } from '@/pages/buses/BusesPage'
 import { MapPage } from '@/pages/map/MapPage'
 import { MorePage } from '@/pages/more/MorePage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
@@ -19,6 +20,11 @@ export function AppRouter() {
           <Route
             index
             element={<MapPage />}
+          />
+
+          <Route
+            path="buses"
+            element={<BusesPage />}
           />
 
           <Route
