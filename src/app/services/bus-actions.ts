@@ -12,6 +12,9 @@ import {
   getBus,
 } from '@/features/buses/application/get-bus'
 import {
+  getBusLayout,
+} from '@/features/buses/application/get-bus-layout'
+import {
   listBuses,
 } from '@/features/buses/application/list-buses'
 import {
@@ -21,7 +24,10 @@ import {
   updateBus,
   type UpdateBusInput,
 } from '@/features/buses/application/update-bus'
-import type { BusId } from '@/features/buses/domain/ids'
+import type {
+  BusId,
+  BusLayoutId,
+} from '@/features/buses/domain/ids'
 import {
   busLayoutRepository,
   busRepository,
@@ -89,6 +95,15 @@ export function getBusAction(
   return getBus(
     id,
     busRepository,
+  )
+}
+
+export function getBusLayoutAction(
+  id: BusLayoutId,
+) {
+  return getBusLayout(
+    id,
+    busLayoutRepository,
   )
 }
 

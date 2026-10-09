@@ -1,18 +1,21 @@
 import {
   BusFront,
-  LayoutGrid,
   Plus,
+  TriangleAlert,
 } from 'lucide-react'
 import { Link } from 'react-router'
 
-import { useActiveBus } from '@/app/hooks/use-active-bus'
+import { useActiveBusLayout } from '@/app/hooks/use-active-bus-layout'
+import { BusMap } from '@/features/seat-map/ui/BusMap'
 import { Card } from '@/shared/ui/Card'
 
 export function MapPage() {
   const {
     activeBus,
+    activeLayout,
     isLoading,
-  } = useActiveBus()
+    error,
+  } = useActiveBusLayout()
 
   return (
     <div className="mx-auto w-full max-w-6xl">
@@ -44,30 +47,40 @@ export function MapPage() {
 
         <p className="max-w-2xl leading-7 text-muted">
           {activeBus
-            ? `Ônibus atual: ${activeBus.name}.`
-            : 'Selecione um ônibus para iniciar a operação.'}
+            ? `Visualização estrutural de ${activeBus.name}.`
+            : 'Selecione um ônibus para visualizar sua configuração.'}
         </p>
       </section>
 
-      <Card
-        className="
-          mt-6
-          flex min-h-80
-          items-center justify-center
-          sm:min-h-96
-        "
-        padding="lg"
-      >
-        {isLoading ? (
+      {isLoading ? (
+        <Card
+          className="
+            mt-6
+            flex min-h-80
+            items-center justify-center
+          "
+          padding="lg"
+        >
           <p className="text-sm text-muted">
-            Carregando...
+            Carregando mapa...
           </p>
-        ) : activeBus ? (
+        </Card>
+      ) : !activeBus ? (
+        <Card
+          className="
+            mt-6
+            flex min-h-80
+            items-center justify-center
+            sm:min-h-96
+          "
+          padding="lg"
+        >
           <div className="max-w-md text-center">
             <div
               className="
                 mx-auto
-                flex size-14 items-center justify-center
+                flex size-14
+                items-center justify-center
                 rounded-card
                 border border-primary/15
                 bg-primary/10
@@ -82,57 +95,11 @@ export function MapPage() {
             </div>
 
             <h3 className="mt-5 text-lg font-semibold tracking-[-0.02em] text-foreground">
-              {activeBus.name}
+              Nenhum ônibus selecionado
             </h3>
 
             <p className="mt-2 text-sm leading-6 text-muted">
-              O ônibus já está cadastrado e persistido localmente. A visualização real dos assentos entra quando implementarmos a engine de layout.
-            </p>
-
-            <div
-              className="
-                mx-auto mt-5
-                flex w-fit items-center gap-2
-                rounded-pill
-                border border-border
-                bg-surface-soft
-                px-3 py-2
-                text-xs text-subtle
-              "
-            >
-              <LayoutGrid
-                aria-hidden="true"
-                size={14}
-              />
-
-              Layout aguardando renderer
-            </div>
-          </div>
-        ) : (
-          <div className="max-w-md text-center">
-            <div
-              className="
-                mx-auto
-                flex size-14 items-center justify-center
-                rounded-card
-                border border-primary/15
-                bg-primary/10
-                text-primary
-              "
-            >
-              <BusFront
-                aria-hidden="true"
-                size={27}
-                strokeWidth={1.7}
-              />
-            </div>
-
-            <h3 className="mt-5 text-lg font-semibold tracking-[-0.02em] text-foreground">
-              Nenhum ônibus cadastrado
-            </h3>
-
-            <p className="mt-2 text-sm leading-6 text-muted">
-              Adicione o primeiro veículo da frota para começarmos a preparar o mapa.
+              Adicione ou selecione um ônibus para visualizar o mapa físico de assentos.
             </p>
 
             <Link
@@ -162,11 +129,82 @@ export function MapPage() {
                 size={17}
               />
 
-              Adicionar ônibus
+              Gerenciar ônibus
             </Link>
           </div>
-        )}
-      </Card>
+        </Card>
+      ) : error || !activeLayout ? (
+        <Card
+          className="
+            mt-6
+            flex min-h-72
+            items-center justify-center
+          "
+          padding="lg"
+        >
+          <div className="max-w-md text-center">
+            <div
+              className="
+                mx-auto
+                flex size-14
+                items-center justify-center
+                rounded-card
+                border border-warning/20
+                bg-warning/10
+                text-warning
+              "
+            >
+              <TriangleAlert
+                aria-hidden="true"
+                size={25}
+              />
+            </div>
+
+            <h3 className="mt-5 text-lg font-semibold text-foreground">
+              Layout indisponível
+            </h3>
+
+            <p className="mt-2 text-sm leading-6 text-muted">
+              {error ??
+                'Não foi possível encontrar o layout ativo deste ônibus.'}
+            </p>
+
+            <Link
+              to="/buses"
+              className="
+                mt-5
+                inline-flex min-h-11
+                items-center justify-center
+                rounded-control
+                border border-border
+                bg-surface-raised
+                px-4
+                text-sm font-semibold
+                text-foreground
+                transition-colors
+                hover:bg-surface-soft
+                focus-visible:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-primary/55
+              "
+            >
+              Gerenciar ônibus
+            </Link>
+          </div>
+        </Card>
+      ) : (
+        <Card
+          className="mt-6"
+          variant="raised"
+          padding="lg"
+        >
+          <BusMap key={String(activeLayout.id)}
+            layout={
+              activeLayout
+            }
+          />
+        </Card>
+      )}
     </div>
   )
 }
