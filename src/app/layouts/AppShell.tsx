@@ -1,0 +1,223 @@
+import { useEffect } from 'react'
+import {
+  BusFront,
+  Circle,
+} from 'lucide-react'
+import {
+  Outlet,
+  useLocation,
+} from 'react-router'
+
+import {
+  DesktopNavigation,
+  MobileNavigation,
+} from '@/app/navigation/AppNavigation'
+import { navigationItems } from '@/app/navigation/navigation-items'
+
+function getCurrentNavigationItem(pathname: string) {
+  return navigationItems.find((item) => {
+    if (item.end) {
+      return pathname === item.path
+    }
+
+    return pathname === item.path || pathname.startsWith(`${item.path}/`)
+  })
+}
+
+export function AppShell() {
+  const location = useLocation()
+
+  const currentNavigationItem = getCurrentNavigationItem(
+    location.pathname,
+  )
+
+  const currentPageTitle =
+    currentNavigationItem?.label ?? 'Poltroy'
+
+  useEffect(() => {
+    document.title =
+      currentPageTitle === 'Mapa'
+        ? 'Poltroy'
+        : `${currentPageTitle} · Poltroy`
+  }, [currentPageTitle])
+
+  return (
+    <div
+      className="
+        min-h-dvh
+        bg-background text-foreground
+        lg:grid
+        lg:grid-cols-[15.5rem_minmax(0,1fr)]
+      "
+    >
+      <aside
+        className="
+          hidden
+          border-r border-border
+          bg-surface/55
+          lg:sticky lg:top-0 lg:flex lg:h-dvh
+          lg:flex-col
+        "
+      >
+        <div className="flex min-h-20 items-center gap-3 px-5">
+          <div
+            className="
+              flex size-10 shrink-0 items-center justify-center
+              rounded-control
+              border border-primary/15
+              bg-primary/10
+              text-primary
+            "
+          >
+            <BusFront
+              aria-hidden="true"
+              size={21}
+              strokeWidth={1.9}
+            />
+          </div>
+
+          <div className="min-w-0">
+            <p className="font-bold tracking-[-0.02em]">
+              Poltroy
+            </p>
+
+            <p className="text-xs text-subtle">
+              Controle de viagens
+            </p>
+          </div>
+        </div>
+
+        <div className="px-3">
+          <DesktopNavigation />
+        </div>
+
+        <div className="mt-auto p-4">
+          <div
+            className="
+              rounded-control
+              border border-border/80
+              bg-surface
+              p-3.5
+            "
+          >
+            <div className="flex items-center gap-2">
+              <Circle
+                aria-hidden="true"
+                className="fill-success text-success"
+                size={8}
+              />
+
+              <span className="text-xs font-semibold text-foreground">
+                Local-first
+              </span>
+            </div>
+
+            <p className="mt-1.5 text-xs leading-5 text-subtle">
+              Preparado para funcionar mesmo com conexão instável.
+            </p>
+          </div>
+        </div>
+      </aside>
+
+      <div className="min-w-0">
+        <header
+          className="
+            sticky top-0 z-[var(--poltroy-z-sticky)]
+            border-b border-border
+            bg-background/90
+            pt-[env(safe-area-inset-top)]
+            backdrop-blur-xl
+          "
+        >
+          <div
+            className="
+              mx-auto flex min-h-16
+              w-full max-w-[100rem]
+              items-center justify-between
+              gap-4
+              px-[var(--poltroy-space-page-inline)]
+            "
+          >
+            <div className="min-w-0">
+              <p
+                className="
+                  text-[0.6875rem] font-bold
+                  tracking-[0.16em]
+                  text-primary
+                  lg:hidden
+                "
+              >
+                POLTROY
+              </p>
+
+              <h1
+                className="
+                  truncate
+                  text-lg font-semibold
+                  tracking-[-0.025em]
+                  text-foreground
+                  lg:text-xl
+                "
+              >
+                {currentPageTitle}
+              </h1>
+            </div>
+
+            <div
+              className="
+                flex min-w-0 items-center gap-2.5
+                rounded-pill
+                border border-border
+                bg-surface
+                px-3 py-2
+                shadow-soft
+              "
+              aria-label="Nenhum ônibus selecionado"
+            >
+              <BusFront
+                aria-hidden="true"
+                className="shrink-0 text-subtle"
+                size={17}
+                strokeWidth={1.8}
+              />
+
+              <span
+                className="
+                  hidden max-w-44 truncate
+                  text-xs font-medium text-muted
+                  sm:block
+                "
+              >
+                Nenhum ônibus
+              </span>
+
+              <span
+                className="
+                  size-2 shrink-0 rounded-full
+                  bg-subtle
+                "
+                aria-hidden="true"
+              />
+            </div>
+          </div>
+        </header>
+
+        <main
+          className="
+            mx-auto
+            min-h-[calc(100dvh-4rem)]
+            w-full max-w-[100rem]
+            px-[var(--poltroy-space-page-inline)]
+            py-[var(--poltroy-space-page-block)]
+            pb-[calc(6.5rem+env(safe-area-inset-bottom))]
+            lg:pb-[var(--poltroy-space-page-block)]
+          "
+        >
+          <Outlet />
+        </main>
+
+        <MobileNavigation />
+      </div>
+    </div>
+  )
+}
