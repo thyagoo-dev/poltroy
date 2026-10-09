@@ -1,0 +1,157 @@
+:root {
+  /*
+   * Colors
+   */
+
+  --poltroy-color-background: #071014;
+
+  --poltroy-color-surface: #0d191e;
+  --poltroy-color-surface-raised: #102128;
+  --poltroy-color-surface-soft: #14272e;
+
+  --poltroy-color-border: #1c3239;
+  --poltroy-color-border-strong: #2c4952;
+
+  --poltroy-color-foreground: #edf7f8;
+  --poltroy-color-muted: #9eb1b7;
+  --poltroy-color-subtle: #72878e;
+
+  --poltroy-color-primary: #55ded7;
+  --poltroy-color-primary-hover: #6be7e0;
+  --poltroy-color-primary-pressed: #3fcac4;
+  --poltroy-color-on-primary: #051416;
+
+  --poltroy-color-success: #5dd6a4;
+  --poltroy-color-warning: #f2c25d;
+  --poltroy-color-danger: #ff7b7f;
+  --poltroy-color-reserved: #f2a45b;
+
+  /*
+   * Seat states
+   */
+
+  --poltroy-color-seat-free: #82969d;
+  --poltroy-color-seat-occupied: #ff768f;
+  --poltroy-color-seat-reserved: #f2a45b;
+  --poltroy-color-seat-blocked: #667982;
+
+  /*
+   * Spacing
+   */
+
+  --poltroy-space-page-inline: clamp(1rem, 3vw, 2rem);
+  --poltroy-space-page-block: clamp(1.25rem, 4vw, 3rem);
+
+  --poltroy-space-section: 1.5rem;
+  --poltroy-space-card: 1.25rem;
+
+  /*
+   * Radius
+   */
+
+  --poltroy-radius-control: 0.875rem;
+  --poltroy-radius-card: 1.5rem;
+  --poltroy-radius-sheet: 1.75rem;
+  --poltroy-radius-pill: 999px;
+
+  /*
+   * Shadows
+   */
+
+  --poltroy-shadow-soft:
+    0 16px 45px rgb(0 0 0 / 18%),
+    inset 0 1px 0 rgb(255 255 255 / 3%);
+
+  --poltroy-shadow-raised:
+    0 22px 60px rgb(0 0 0 / 24%),
+    inset 0 1px 0 rgb(255 255 255 / 4%);
+
+  --poltroy-shadow-control:
+    0 8px 20px rgb(0 0 0 / 16%),
+    inset 0 1px 0 rgb(255 255 255 / 8%);
+
+  /*
+   * Typography
+   */
+
+  --poltroy-font-sans:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  /*
+   * Motion
+   */
+
+  --poltroy-duration-fast: 120ms;
+  --poltroy-duration-normal: 180ms;
+  --poltroy-duration-slow: 260ms;
+
+  --poltroy-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --poltroy-ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /*
+   * Z-index
+   */
+
+  --poltroy-z-base: 0;
+  --poltroy-z-dropdown: 20;
+  --poltroy-z-sticky: 30;
+  --poltroy-z-overlay: 40;
+  --poltroy-z-modal: 50;
+  --poltroy-z-toast: 60;
+}
+
+@theme inline {
+  --font-sans: var(--poltroy-font-sans);
+
+  --color-background: var(--poltroy-color-background);
+
+  --color-surface: var(--poltroy-color-surface);
+  --color-surface-raised: var(--poltroy-color-surface-raised);
+  --color-surface-soft: var(--poltroy-color-surface-soft);
+
+  --color-border: var(--poltroy-color-border);
+  --color-border-strong: var(--poltroy-color-border-strong);
+
+  --color-foreground: var(--poltroy-color-foreground);
+  --color-muted: var(--poltroy-color-muted);
+  --color-subtle: var(--poltroy-color-subtle);
+
+  --color-primary: var(--poltroy-color-primary);
+  --color-primary-hover: var(--poltroy-color-primary-hover);
+  --color-primary-pressed: var(--poltroy-color-primary-pressed);
+  --color-on-primary: var(--poltroy-color-on-primary);
+
+  --color-success: var(--poltroy-color-success);
+  --color-warning: var(--poltroy-color-warning);
+  --color-danger: var(--poltroy-color-danger);
+  --color-reserved: var(--poltroy-color-reserved);
+
+  --color-seat-free: var(--poltroy-color-seat-free);
+  --color-seat-occupied: var(--poltroy-color-seat-occupied);
+  --color-seat-reserved: var(--poltroy-color-seat-reserved);
+  --color-seat-blocked: var(--poltroy-color-seat-blocked);
+
+  --radius-control: var(--poltroy-radius-control);
+  --radius-card: var(--poltroy-radius-card);
+  --radius-sheet: var(--poltroy-radius-sheet);
+  --radius-pill: var(--poltroy-radius-pill);
+
+  --shadow-soft: var(--poltroy-shadow-soft);
+  --shadow-raised: var(--poltroy-shadow-raised);
+  --shadow-control: var(--poltroy-shadow-control);
+}
+
+@theme {
+  --breakpoint-xs: 30rem;
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 96rem;
+}
