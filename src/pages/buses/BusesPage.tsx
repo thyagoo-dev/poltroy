@@ -29,6 +29,7 @@ import {
   type BusFormValues,
 } from '@/features/buses/ui/BusForm'
 import { useBusSelectionStore } from '@/features/buses/ui/bus-selection-store'
+import { useTripOperationStore } from '@/features/trips/ui/trip-operation-store'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog'
@@ -45,6 +46,7 @@ type FormState =
 
 export function BusesPage() {
   const navigate = useNavigate()
+  const clearOperationalTrip = useTripOperationStore((state) => state.clearOperationalTrip)
 
   const activeBusId =
     useBusSelectionStore(
@@ -190,6 +192,7 @@ export function BusesPage() {
             values.presetId,
         })
 
+      clearOperationalTrip()
       selectBus(bus.id)
 
       setFormState(null)
@@ -292,6 +295,7 @@ export function BusesPage() {
         activeBusId ===
         archiveTarget.id
       ) {
+        clearOperationalTrip()
         clearBus()
       }
 
@@ -340,6 +344,7 @@ export function BusesPage() {
   function handleSelect(
     bus: Bus,
   ) {
+    clearOperationalTrip()
     selectBus(bus.id)
 
     navigate('/')

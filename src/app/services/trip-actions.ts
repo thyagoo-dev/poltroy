@@ -9,8 +9,18 @@ import {
   type CreateTripInput,
 } from '@/features/trips/application/create-trip'
 import {
+  getTrip,
+} from '@/features/trips/application/get-trip'
+import {
   listTrips,
 } from '@/features/trips/application/list-trips'
+import {
+  listTripSeatStates,
+} from '@/features/trips/application/list-trip-seat-states'
+import {
+  setTripSeatStatus,
+  type SetTripSeatStatusInput,
+} from '@/features/trips/application/set-trip-seat-status'
 import {
   startTrip,
 } from '@/features/trips/application/start-trip'
@@ -23,6 +33,7 @@ import {
   busLayoutRepository,
   busRepository,
   tripRepository,
+  tripSeatStateRepository,
 } from '@/infrastructure/repositories/repositories'
 
 export function createTripAction(
@@ -85,10 +96,41 @@ export function cancelTripAction(
   )
 }
 
+export function getTripAction(
+  id: TripId,
+) {
+  return getTrip(
+    id,
+    tripRepository,
+  )
+}
+
 export function listTripsAction() {
   return listTrips({
     tripRepository,
     busRepository,
     busLayoutRepository,
   })
+}
+
+export function listTripSeatStatesAction(
+  tripId: TripId,
+) {
+  return listTripSeatStates(
+    tripId,
+    tripSeatStateRepository,
+  )
+}
+
+export function setTripSeatStatusAction(
+  input: SetTripSeatStatusInput,
+) {
+  return setTripSeatStatus(
+    input,
+    {
+      tripRepository,
+      busLayoutRepository,
+      tripSeatStateRepository,
+    },
+  )
 }

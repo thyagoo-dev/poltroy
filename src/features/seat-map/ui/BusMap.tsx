@@ -2,16 +2,17 @@ import {
   Armchair,
 } from 'lucide-react'
 import {
+  Fragment,
   useMemo,
   useState,
+  type ReactNode,
 } from 'react'
 
 import type { BusLayout } from '@/features/buses/domain/bus-layout'
-import type {
-  StructuralLayoutElementKind,
-} from '@/features/seat-map/domain/layout-element'
+import type { StructuralLayoutElementKind } from '@/features/seat-map/domain/layout-element'
 import {
   buildLayoutModel,
+  type LayoutElementPlacement,
 } from '@/features/seat-map/domain/layout-engine'
 import { LayoutElementView } from '@/features/seat-map/ui/LayoutElementView'
 import { structuralElementVisuals } from '@/features/seat-map/ui/layout-element-visuals'
@@ -19,6 +20,11 @@ import { cn } from '@/shared/lib/cn'
 
 interface BusMapProps {
   layout: BusLayout
+
+  renderElement?: (
+    placement:
+      LayoutElementPlacement,
+  ) => ReactNode
 }
 
 const structuralElementOrder:
@@ -34,13 +40,14 @@ const structuralElementOrder:
 
 export function BusMap({
   layout,
+  renderElement,
 }: BusMapProps) {
   const [
     selectedDeck,
     setSelectedDeck,
-  ] = useState<number | null>(
-    null,
-  )
+  ] = useState<
+    number | null
+  >(null)
 
   const layoutResult =
     useMemo(() => {
@@ -97,7 +104,8 @@ export function BusMap({
     layoutResult
 
   if (
-    model.collisions.length > 0
+    model.collisions.length >
+    0
   ) {
     return (
       <div
@@ -314,15 +322,21 @@ export function BusMap({
           >
             {activeDeck.placements.map(
               (placement) => (
-                <LayoutElementView
+                <Fragment
                   key={String(
-                    placement
-                      .element.id,
+                    placement.element.id,
                   )}
-                  placement={
-                    placement
-                  }
-                />
+                >
+                  {renderElement?.(
+                    placement,
+                  ) ?? (
+                    <LayoutElementView
+                      placement={
+                        placement
+                      }
+                    />
+                  )}
+                </Fragment>
               ),
             )}
           </div>
@@ -408,7 +422,7 @@ export function BusMap({
           text-subtle
         "
       >
-        Visualização estrutural do veículo. Os estados operacionais dos assentos serão aplicados quando o mapa estiver associado a uma viagem.
+        A configuração física pertence à versão do layout associada a esta visualização.
       </p>
     </section>
   )

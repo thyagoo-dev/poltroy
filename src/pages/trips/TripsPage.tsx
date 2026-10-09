@@ -8,7 +8,7 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 
 import { listBusesAction } from '@/app/services/bus-actions'
 import {
@@ -26,6 +26,7 @@ import {
   TripForm,
   type TripFormValues,
 } from '@/features/trips/ui/TripForm'
+import { useTripOperationStore } from '@/features/trips/ui/trip-operation-store'
 import { TripCard } from '@/features/trips/ui/TripCard'
 import { useBusSelectionStore } from '@/features/buses/ui/bus-selection-store'
 import { Button } from '@/shared/ui/Button'
@@ -43,6 +44,10 @@ type FormState =
   | null
 
 export function TripsPage() {
+  const navigate = useNavigate()
+  const operationalTripId = useTripOperationStore((state) => state.operationalTripId)
+  const selectOperationalTrip = useTripOperationStore((state) => state.selectOperationalTrip)
+  const clearOperationalTrip = useTripOperationStore((state) => state.clearOperationalTrip)
   const activeBusId =
     useBusSelectionStore(
       (state) =>
@@ -288,6 +293,8 @@ export function TripsPage() {
         updatedTrip.busId,
       )
 
+      selectOperationalTrip(updatedTrip.id)
+
       setMessage(
         'Viagem iniciada. O ônibus da viagem foi selecionado para a operação.',
       )
@@ -315,6 +322,8 @@ export function TripsPage() {
       await completeTripAction(
         trip.id,
       )
+
+      if (operationalTripId === trip.id) clearOperationalTrip()
 
       setMessage(
         'Viagem concluída.',
@@ -346,6 +355,8 @@ export function TripsPage() {
       await cancelTripAction(
         cancelTarget.id,
       )
+
+      if (operationalTripId === cancelTarget.id) clearOperationalTrip()
 
       setCancelTarget(null)
 
@@ -379,6 +390,12 @@ export function TripsPage() {
     setFormState(null)
   }
 
+  function handleOpenMap(summary: TripSummary) {
+    selectBus(summary.trip.busId)
+    selectOperationalTrip(summary.trip.id)
+    navigate('/')
+  }
+
   function renderTripGrid(
     summaries:
       readonly TripSummary[],
@@ -394,6 +411,7 @@ export function TripsPage() {
               summary={
                 summary
               }
+              onOpenMap={() => handleOpenMap(summary)}
               onEdit={() =>
                 openForm({
                   type: 'edit',

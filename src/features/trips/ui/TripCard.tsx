@@ -3,6 +3,7 @@ import {
   BusFront,
   CalendarClock,
   Check,
+  LayoutGrid,
   MapPin,
   Pencil,
   Play,
@@ -18,6 +19,7 @@ import { Card } from '@/shared/ui/Card'
 interface TripCardProps {
   summary: TripSummary
 
+  onOpenMap: () => void
   onEdit: () => void
   onStart: () => void
   onComplete: () => void
@@ -55,6 +57,7 @@ const statusClasses:
 
 export function TripCard({
   summary,
+  onOpenMap,
   onEdit,
   onStart,
   onComplete,
@@ -66,6 +69,12 @@ export function TripCard({
     layout,
     seatCount,
   } = summary
+
+  const isOperational =
+    trip.status ===
+      'PLANNED' ||
+    trip.status ===
+      'ACTIVE'
 
   return (
     <Card
@@ -176,11 +185,23 @@ export function TripCard({
           </p>
         )}
 
-        {(trip.status ===
-          'PLANNED' ||
-          trip.status ===
-            'ACTIVE') && (
+        {isOperational && (
           <div className="flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={
+                onOpenMap
+              }
+            >
+              <LayoutGrid
+                aria-hidden="true"
+                size={15}
+              />
+
+              Abrir mapa
+            </Button>
+
             {trip.status ===
               'PLANNED' && (
               <>
@@ -200,7 +221,7 @@ export function TripCard({
 
                 <Button
                   size="sm"
-                  variant="secondary"
+                  variant="ghost"
                   onClick={
                     onEdit
                   }
