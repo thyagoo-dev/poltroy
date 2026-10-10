@@ -114,3 +114,7 @@ A listagem `/passengers` reúne busca e acesso aos cadastros. Criação e ediç�
 ## Central Mais — Refino 15.6
 
 `/more` reúne os links para Aplicativo (`/more/app`), Backup e restauração (`/more/backup`), Configurações (`/more/settings`) e Sobre (`/more/about`). Instalação PWA e backup têm páginas próprias; Configurações informa que ainda não há preferências configuráveis. As subrotas funcionam offline após o cache da aplicação estar disponível.
+
+## Shell e contexto de ônibus — Refino 15.7
+
+O header mostra o ônibus selecionado em Mapa e Viagens como link para a Frota; em `/buses`, apresenta um indicador sem navegação redundante. Passageiros, Mais, suas subrotas e páginas não encontradas não exibem esse contexto. O header permanece `sticky`, com safe area e tokens de altura preservados; seu topo foi validado durante a rolagem longa no preview de produção.

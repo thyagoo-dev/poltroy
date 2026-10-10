@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import {
   BusFront,
   Circle,
-  ChevronDown,
+  ChevronRight,
 } from 'lucide-react'
 import {
   Link,
@@ -11,6 +11,7 @@ import {
 } from 'react-router'
 
 import { useActiveBus } from '@/app/hooks/use-active-bus'
+import { getShellBusContext } from '@/app/layouts/shell-route-context'
 import {
   DesktopNavigation,
   MobileNavigation,
@@ -70,6 +71,8 @@ export function AppShell() {
       location.pathname,
     )
 
+  const busContext = getShellBusContext(location.pathname)
+
   useEffect(() => {
     document.title =
       currentPageTitle === 'Mapa'
@@ -82,6 +85,18 @@ export function AppShell() {
       ? 'Carregando...'
       : activeBus?.name ??
         'Nenhum ônibus'
+
+  const busContextClassName = `
+    flex min-h-11 min-w-0 flex-1 max-w-[13rem]
+    items-center gap-2.5 rounded-pill border border-border
+    bg-surface px-3 py-2 shadow-soft sm:max-w-[18rem]
+  `
+  const busContextContent = <>
+    <BusFront aria-hidden="true" className={activeBus ? 'shrink-0 text-primary' : 'shrink-0 text-subtle'} size={17} strokeWidth={1.8} />
+    {busContext === 'indicator' && <span className="sr-only">Ônibus selecionado: </span>}
+    <span className="min-w-0 flex-1 truncate text-xs font-medium text-muted">{activeBusLabel}</span>
+    {busContext === 'link' && <ChevronRight aria-hidden="true" className="shrink-0 text-subtle" size={14} />}
+  </>
 
   return (
     <div
@@ -205,56 +220,24 @@ export function AppShell() {
               </h1>
             </div>
 
-            <Link
+            {busContext === 'link' && <Link
               to="/buses"
-              className="
-                flex min-h-11 min-w-0 flex-1
-                max-w-[13rem]
-                items-center gap-2.5
-                rounded-pill
-                border border-border
-                bg-surface
-                px-3 py-2
-                shadow-soft
+              className={`${busContextClassName}
                 transition-[border-color,background-color]
                 hover:border-border-strong
                 hover:bg-surface-raised
                 focus-visible:outline-none
                 focus-visible:ring-2
                 focus-visible:ring-primary
-                sm:max-w-[18rem]
-              "
+              `}
               aria-label={`Gerenciar ônibus. Selecionado: ${activeBusLabel}`}
               title={activeBusLabel}
             >
-              <BusFront
-                aria-hidden="true"
-                className={
-                  activeBus
-                    ? 'shrink-0 text-primary'
-                    : 'shrink-0 text-subtle'
-                }
-                size={17}
-                strokeWidth={1.8}
-              />
-
-              <span
-                className="
-                  min-w-0 flex-1
-                  truncate
-                  text-xs font-medium
-                  text-muted
-                "
-              >
-                {activeBusLabel}
-              </span>
-
-              <ChevronDown
-                aria-hidden="true"
-                className="shrink-0 text-subtle"
-                size={14}
-              />
-            </Link>
+              {busContextContent}
+            </Link>}
+            {busContext === 'indicator' && <div className={busContextClassName} title={activeBusLabel}>
+              {busContextContent}
+            </div>}
           </div>
         </header>
 
