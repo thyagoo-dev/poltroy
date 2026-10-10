@@ -1,10 +1,10 @@
-import type { PoltroyBackup } from '@/features/backup/domain/backup-document'
+import type { LegacyPoltroyBackup, PoltroyBackup } from '@/features/backup/domain/backup-document'
 import type { BusId, BusLayoutId } from '@/features/buses/domain/ids'
 import type { PassengerId } from '@/features/passengers/domain/ids'
 import type { SeatId } from '@/features/seat-map/domain/ids'
 import type { TripId, TripSeatStateId } from '@/features/trips/domain/ids'
 
-export function backupFixture(prefix = 'a'): PoltroyBackup {
+export function backupFixture(prefix = 'a'): LegacyPoltroyBackup {
   const timestamp = '2026-10-10T12:00:00.000Z'
   const times = { createdAt: timestamp, updatedAt: timestamp }
   const busId = `${prefix}-bus` as BusId
@@ -27,6 +27,13 @@ export function backupFixture(prefix = 'a'): PoltroyBackup {
   }
 }
 
-export function emptyBackupFixture(): PoltroyBackup {
+export function emptyBackupFixture(): LegacyPoltroyBackup {
   return { ...backupFixture(), data: { buses: [], busLayouts: [], trips: [], passengers: [], tripSeatStates: [] } }
+}
+
+export function backupV2Fixture(prefix = 'a'): PoltroyBackup {
+  const legacy = backupFixture(prefix)
+  return { ...legacy, backupVersion: 2, data: {
+    ...legacy.data, passengers: legacy.data.passengers.map((passenger) => ({ ...passenger, displayName: 'Passageiro de te' })),
+  } }
 }

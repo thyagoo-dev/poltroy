@@ -83,6 +83,16 @@ describe('Filtros operacionais', () => {
 })
 
 describe('Busca operacional', () => {
+  it('busca displayName sem usar CPF ou RG', () => {
+    const person = { ...passenger, displayName: 'Apelido', documentType: 'CPF' as const, documentNumber: '98765432109' }
+    const assigned = state(0, 'RESERVED', person.id)
+    const match = (search: string) => matchesOperationalSeatFilter({ seat: seats[0], state: assigned, passenger: person, filter: 'ALL', search })
+    expect(match('apelido')).toBe(true)
+    expect(match('João')).toBe(true)
+    expect(match('98765432109')).toBe(false)
+    expect(match('987.654.321-09')).toBe(false)
+    expect(matchesOperationalSeatFilter({ seat: seats[0], state: assigned, passenger: { ...person, documentType: 'RG', documentNumber: 'documento-unico' }, filter: 'ALL', search: 'documento-unico' })).toBe(false)
+  })
   const seat = { ...seats[0], seatNumber: '18' }
   const assigned = state(0, 'RESERVED', passenger.id)
   it.each(['18', '8', 'joão', 'JOÃO', '1234', '  João  ', '', '   '])('encontra assento ou passageiro usando %j', (search) => {

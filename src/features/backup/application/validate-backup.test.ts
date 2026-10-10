@@ -1,15 +1,60 @@
 import { describe, expect, it } from 'vitest'
 
 import { MAX_BACKUP_LAYOUT_CELLS, parsePoltroyBackup, validatePoltroyBackup } from '@/features/backup/application/validate-backup'
-import type { PoltroyBackup } from '@/features/backup/domain/backup-document'
+import type { PoltroyBackupInput } from '@/features/backup/domain/backup-document'
 import type { BusLayoutElement } from '@/features/seat-map/domain/layout-element'
-import { backupFixture, emptyBackupFixture } from '@/features/backup/test/backup-fixtures'
+import { backupFixture, backupV2Fixture, emptyBackupFixture } from '@/features/backup/test/backup-fixtures'
 
 describe('backup validation', () => {
+  it('converte v1 em memória sem alterar IDs, timestamps, associações ou input', () => {
+    const input = backupFixture()
+    const before = structuredClone(input)
+    const result = validatePoltroyBackup(input)
+    expect(input).toEqual(before)
+    expect(result.success).toBe(true)
+    if (!result.success) return
+    expect(result.backup.backupVersion).toBe(2)
+    expect(result.backup.data.passengers[0]).toEqual({ ...before.data.passengers[0], displayName: 'Passageiro de te' })
+    expect(result.backup.data.tripSeatStates).toEqual(before.data.tripSeatStates)
+    expect(validatePoltroyBackup(result.backup).success).toBe(true)
+  })
+
+  it('preserva os campos antigos também na revalidação v2 após converter v1', () => {
+    const input = backupFixture()
+    Object.assign(input.data.passengers[0], { name: '  Nome antigo  ', phone: '  123  ', notes: '  Observação  ' })
+    const first = validatePoltroyBackup(input)
+    expect(first.success).toBe(true)
+    if (!first.success) return
+    const second = validatePoltroyBackup(first.backup)
+    expect(second).toEqual(first)
+    expect(first.backup.data.passengers[0]).toMatchObject(input.data.passengers[0])
+  })
+
+  it.each([
+    ['CPF', '12345678901'], ['RG', 'ab-12 / X'],
+  ] as const)('aceita e preserva documento %s em v2, inclusive na revalidação do preview', (documentType, documentNumber) => {
+    const input = backupV2Fixture()
+    Object.assign(input.data.passengers[0], { documentType, documentNumber })
+    const result = validatePoltroyBackup(input)
+    expect(result).toEqual({ success: true, backup: input })
+    if (result.success) expect(validatePoltroyBackup(result.backup)).toEqual(result)
+  })
+
+  it.each([
+    { displayName: undefined }, { displayName: '' }, { displayName: ' ' }, { displayName: 'x'.repeat(17) },
+    { documentType: 'CPF' }, { documentNumber: '12345678901' },
+    { documentType: 'CPF', documentNumber: '' }, { documentType: 'CPF', documentNumber: '123' },
+    { documentType: 'CPF', documentNumber: '123.456.789-01' }, { documentType: 'CPF', documentNumber: '123456789012' },
+    { documentType: 'CNH', documentNumber: '12345678901' }, { documentType: 'RG', documentNumber: 'x'.repeat(33) },
+  ])('rejeita campos v2 inválidos antes da escrita: %j', (fields) => {
+    const input = backupV2Fixture()
+    Object.assign(input.data.passengers[0], fields)
+    expect(validatePoltroyBackup(input).success).toBe(false)
+  })
   it('aceita versão 1 com dados, sem modificar os valores persistidos', () => {
     const input = backupFixture()
     input.data.passengers[0].name = '  Nome preservado  '
-    expect(validatePoltroyBackup(input)).toEqual({ success: true, backup: input })
+    expect(validatePoltroyBackup(input)).toEqual({ success: true, backup: { ...input, backupVersion: 2, data: { ...input.data, passengers: [{ ...input.data.passengers[0], displayName: 'Nome preservado' }] } } })
   })
 
   it('aceita cinco coleções vazias', () => {
@@ -59,7 +104,7 @@ describe('backup validation', () => {
     expect(validatePoltroyBackup(input).success).toBe(false)
   })
 
-  const invalidCases: [string, (backup: PoltroyBackup) => void, string][] = [
+  const invalidCases: [string, (backup: PoltroyBackupInput) => void, string][] = [
     ['outro aplicativo', (b) => Object.assign(b, { app: 'OUTRO' }), 'app'],
     ['versão futura', (b) => Object.assign(b, { backupVersion: 99 }), 'backupVersion'],
     ['data ausente', (b) => Reflect.deleteProperty(b, 'data'), 'data'],
@@ -152,7 +197,7 @@ describe('backup validation', () => {
     if (result.success) {
       expect(Object.hasOwn(result.backup.data.passengers[0], '__proto__')).toBe(false)
       expect(Object.hasOwn(result.backup.data.passengers[0], 'extra')).toBe(false)
-      expect(result.backup.data).toEqual(backupFixture().data)
+      expect(result.backup.data).toEqual(backupV2Fixture().data)
     }
   })
 

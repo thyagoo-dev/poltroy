@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { restoreBackup } from '@/features/backup/application/restore-backup'
-import { backupFixture, emptyBackupFixture } from '@/features/backup/test/backup-fixtures'
+import { backupFixture, backupV2Fixture, emptyBackupFixture } from '@/features/backup/test/backup-fixtures'
 import { PoltroyDatabase } from '@/infrastructure/database/poltroy-database'
 import { DexieBackupRepository } from '@/infrastructure/repositories/dexie-backup-repository'
 
@@ -20,6 +20,15 @@ afterEach(async () => {
 })
 
 describe('Dexie backup repository', () => {
+  it('restaura v2 com documento nos cinco stores e conserva atomicidade em falha posterior', async () => {
+    const original = backupV2Fixture('a')
+    Object.assign(original.data.passengers[0], { displayName: 'Thyago', documentType: 'CPF', documentNumber: '12345678901' })
+    await restoreBackup(original, repository)
+    expect(await repository.exportSnapshot()).toEqual(original.data)
+    vi.spyOn(database.tripSeatStates, 'bulkPut').mockRejectedValueOnce(new Error('Falha v2'))
+    await expect(restoreBackup(backupV2Fixture('b'), repository)).rejects.toThrow('Falha v2')
+    expect(await repository.exportSnapshot()).toEqual(original.data)
+  })
   it('exporta snapshot consistente em transação readonly dos cinco stores', async () => {
     const input = backupFixture()
     await repository.replaceAll(input.data)
@@ -31,7 +40,7 @@ describe('Dexie backup repository', () => {
   it('substitui Dataset A por B completamente nos cinco stores', async () => {
     await repository.replaceAll(backupFixture('a').data)
     await restoreBackup(backupFixture('b'), repository)
-    expect(await repository.exportSnapshot()).toEqual(backupFixture('b').data)
+    expect(await repository.exportSnapshot()).toEqual(backupV2Fixture('b').data)
   })
 
   it('rollback integral preserva A quando falha na última escrita depois de clear e quatro imports', async () => {

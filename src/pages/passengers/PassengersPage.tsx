@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import { createPassengerAction, listPassengersAction, updatePassengerAction } from '@/app/services/passenger-actions'
 import type { PassengerInputFields } from '@/features/passengers/application/passenger-input'
 import type { Passenger } from '@/features/passengers/domain/passenger'
+import { resolvePassengerDisplayName } from '@/features/passengers/domain/passenger-display-name'
+import { matchesPassengerSearch } from '@/features/passengers/domain/passenger-search'
 import { PassengerForm } from '@/features/passengers/ui/PassengerForm'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
@@ -57,9 +59,7 @@ export function PassengersPage() {
     }
   }
 
-  const search = query.trim().toLocaleLowerCase()
-  const filtered = passengers.filter((passenger) => passenger.name.toLocaleLowerCase().includes(search)
-    || passenger.phone?.toLocaleLowerCase().includes(search))
+  const filtered = passengers.filter((passenger) => matchesPassengerSearch(passenger, query))
 
   return (
     <div className="mx-auto w-full max-w-6xl">
@@ -89,7 +89,7 @@ export function PassengersPage() {
 
       <div className="mt-6">
         <label htmlFor="passenger-search" className="text-sm font-semibold">Buscar passageiros</label>
-        <Input id="passenger-search" type="search" className="mt-2" placeholder="Nome ou telefone"
+        <Input id="passenger-search" type="search" className="mt-2" placeholder="Nome, nome de exibição, telefone ou documento"
           value={query} onChange={(event) => setQuery(event.target.value)} />
       </div>
 
@@ -98,7 +98,7 @@ export function PassengersPage() {
           <Card className="mt-6 text-center" padding="lg">
             <UsersRound aria-hidden="true" className="mx-auto text-primary" size={27} />
             <h3 className="mt-4 text-lg font-semibold">{passengers.length ? 'Nenhum passageiro encontrado' : 'Nenhum passageiro cadastrado'}</h3>
-            <p className="mt-2 text-sm text-muted">{passengers.length ? 'Tente outro nome ou telefone.' : 'Use Novo passageiro para começar.'}</p>
+            <p className="mt-2 text-sm text-muted">{passengers.length ? 'Tente outro nome, telefone ou documento.' : 'Use Novo passageiro para começar.'}</p>
           </Card>
         ) : (
           <ul aria-label="Passageiros cadastrados" className="mt-4 grid gap-3 md:grid-cols-2">
@@ -106,6 +106,7 @@ export function PassengersPage() {
               <li key={passenger.id} className="min-w-0">
                 <Card padding="md" className="h-full">
                   <h3 className="break-words font-semibold">{passenger.name}</h3>
+                  <p className="mt-1 break-words text-xs text-subtle">No mapa: {resolvePassengerDisplayName(passenger)}</p>
                   {passenger.phone && <p className="mt-1 break-words text-sm text-muted">{passenger.phone}</p>}
                   {passenger.notes && <p className="mt-2 line-clamp-2 break-words text-sm leading-6 text-subtle">{passenger.notes}</p>}
                   <Button variant="secondary" size="sm" className="mt-4" disabled={Boolean(formState)}

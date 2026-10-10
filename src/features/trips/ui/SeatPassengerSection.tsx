@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 
 import type { PassengerId } from '@/features/passengers/domain/ids'
 import type { Passenger } from '@/features/passengers/domain/passenger'
+import { resolvePassengerDisplayName } from '@/features/passengers/domain/passenger-display-name'
 import { Button } from '@/shared/ui/Button'
 import { Input } from '@/shared/ui/Input'
 
@@ -18,6 +19,7 @@ export function SeatPassengerSection({ passengers, passengerId, isPending, onSel
   const [query, setQuery] = useState('')
   const search = query.trim().toLocaleLowerCase()
   const filtered = passengers.filter((item) => item.name.toLocaleLowerCase().includes(search)
+    || resolvePassengerDisplayName(item).toLocaleLowerCase().includes(search)
     || item.phone?.toLocaleLowerCase().includes(search))
 
   return (

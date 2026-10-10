@@ -111,7 +111,7 @@ export function LocalDataBackupCard() {
       <section aria-labelledby="local-backup-title" aria-busy={busy !== null}>
         <h3 id="local-backup-title" className="font-semibold">Backup e restauração</h3>
         <p className="mt-2 text-sm leading-6 text-muted">Mantenha uma cópia dos dados armazenados neste dispositivo. Exportação e restauração funcionam também offline.</p>
-        <p className="mt-3 text-sm leading-6 text-muted">O backup pode conter nomes, telefones, observações e dados operacionais. Guarde o arquivo em local seguro.</p>
+        <p className="mt-3 text-sm leading-6 text-muted">O backup pode conter nomes, telefones, documentos de identificação, observações e dados operacionais. Guarde o arquivo em local seguro.</p>
 
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <Button variant="secondary" disabled={busy !== null} onClick={() => void handleExport()}>

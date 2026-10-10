@@ -1,4 +1,5 @@
 import type { Passenger } from '@/features/passengers/domain/passenger'
+import { resolvePassengerDisplayName } from '@/features/passengers/domain/passenger-display-name'
 import type { SeatLayoutElement } from '@/features/seat-map/domain/seat'
 import { resolveSeatStatus, type SeatStatus, type TripSeatState } from '@/features/trips/domain/trip-seat-state'
 
@@ -27,6 +28,7 @@ export function matchesOperationalSeatFilter({ seat, state, passenger, filter, s
     && passenger !== undefined && state.passengerId === passenger.id
   return Boolean(isAssociatedPassenger && (
     passenger.name.toLocaleLowerCase().includes(term)
+    || resolvePassengerDisplayName(passenger).toLocaleLowerCase().includes(term)
     || passenger.phone?.toLocaleLowerCase().includes(term)
   ))
 }

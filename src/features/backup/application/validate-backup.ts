@@ -4,12 +4,15 @@ import {
   type BackupIssue,
   type BackupValidationResult,
   type LocalDataSnapshot,
+  type CurrentDataSnapshot,
+  type BackupPassengerV2,
 } from '@/features/backup/domain/backup-document'
 import type { Bus } from '@/features/buses/domain/bus'
 import { validateBusLayout, type BusLayout } from '@/features/buses/domain/bus-layout'
 import type { BusId, BusLayoutId } from '@/features/buses/domain/ids'
 import type { PassengerId } from '@/features/passengers/domain/ids'
-import type { Passenger } from '@/features/passengers/domain/passenger'
+import { normalizePassengerFields } from '@/features/passengers/application/passenger-input'
+import { resolvePassengerDisplayName } from '@/features/passengers/domain/passenger-display-name'
 import type { BusLayoutElement } from '@/features/seat-map/domain/layout-element'
 import type { LayoutElementId, SeatId } from '@/features/seat-map/domain/ids'
 import type { TripId, TripSeatStateId } from '@/features/trips/domain/ids'
@@ -83,7 +86,7 @@ class Reader {
   }
 }
 
-function parseSnapshot(data: Record<string, unknown>, reader: Reader): LocalDataSnapshot {
+function parseSnapshot(data: Record<string, unknown>, reader: Reader, legacy: boolean): CurrentDataSnapshot {
   const buses = reader.array<Bus>(data.buses, 'data.buses', (row, path) => ({
     id: reader.text(row.id, `${path}.id`) as BusId,
     name: reader.text(row.name, `${path}.name`),
@@ -134,13 +137,38 @@ function parseSnapshot(data: Record<string, unknown>, reader: Reader): LocalData
     }
     return layout
   })
-  const passengers = reader.array<Passenger>(data.passengers, 'data.passengers', (row, path) => ({
-    id: reader.text(row.id, `${path}.id`) as PassengerId,
-    name: reader.text(row.name, `${path}.name`),
-    ...reader.timestamps(row, path),
-    ...reader.optionalText(row, 'phone', path),
-    ...reader.optionalText(row, 'notes', path),
-  }))
+  const passengers = reader.array<BackupPassengerV2>(data.passengers, 'data.passengers', (row, path) => {
+    const base = {
+      id: reader.text(row.id, `${path}.id`) as PassengerId,
+      name: reader.text(row.name, `${path}.name`),
+      ...reader.timestamps(row, path),
+      ...reader.optionalText(row, 'phone', path),
+      ...reader.optionalText(row, 'notes', path),
+    }
+    if (legacy) return { ...base, displayName: resolvePassengerDisplayName(base) }
+    const displayName = reader.text(row.displayName, `${path}.displayName`)
+    const hasType = Object.hasOwn(row, 'documentType')
+    const hasNumber = Object.hasOwn(row, 'documentNumber')
+    if (hasType !== hasNumber) reader.issue(path, 'Tipo e número do documento devem estar ambos presentes ou ausentes.')
+    const documentType = hasType ? reader.choice(row.documentType, ['CPF', 'RG'], `${path}.documentType`) : undefined
+    const documentNumber = hasNumber ? reader.text(row.documentNumber, `${path}.documentNumber`) : undefined
+    if (documentType === 'CPF' && documentNumber !== undefined && !/^\d{11}$/.test(documentNumber)) {
+      reader.issue(`${path}.documentNumber`, 'CPF deve conter 11 dígitos canônicos, sem formatação.')
+    }
+    try {
+      const fields = normalizePassengerFields({ ...base, displayName, documentType, documentNumber })
+      // Validate with the application rules, preserving serialized legacy fields
+      // when the UI revalidates the converted v1 document before restoring it.
+      const passenger = { ...base, displayName: fields.displayName, documentType: fields.documentType, documentNumber: fields.documentNumber }
+      for (const key of ['phone', 'notes', 'documentType', 'documentNumber'] as const) {
+        if (passenger[key] === undefined) delete passenger[key]
+      }
+      return passenger
+    } catch (error) {
+      reader.issue(path, error instanceof Error ? error.message : 'Dados de passageiro inválidos.')
+      return { ...base, displayName }
+    }
+  })
   const trips = reader.array<Trip>(data.trips, 'data.trips', (row, path) => {
     const trip: Trip = {
       id: reader.text(row.id, `${path}.id`) as TripId,
@@ -241,10 +269,10 @@ export function validatePoltroyBackup(input: unknown): BackupValidationResult {
   const reader = new Reader()
   const document = reader.object(input, 'backup')
   if (document.app !== 'POLTROY') reader.issue('app', 'Este arquivo não é um backup do POLTROY.')
-  if (document.backupVersion !== POLTROY_BACKUP_VERSION) reader.issue('backupVersion', 'Esta versão de backup ainda não é compatível com esta versão do POLTROY.')
+  if (document.backupVersion !== 1 && document.backupVersion !== POLTROY_BACKUP_VERSION) reader.issue('backupVersion', 'Esta versão de backup ainda não é compatível com esta versão do POLTROY.')
   const exportedAt = reader.timestamp(document.exportedAt, 'exportedAt')
   if (exportedAt && !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})$/.test(exportedAt)) reader.issue('exportedAt', 'Use um timestamp ISO com fuso horário.')
-  const data = parseSnapshot(reader.object(document.data, 'data'), reader)
+  const data = parseSnapshot(reader.object(document.data, 'data'), reader, document.backupVersion === 1)
   validateReferences(data, reader)
   return reader.issues.length
     ? { success: false, issues: reader.issues }

@@ -6,6 +6,7 @@ import {
 import type { BusLayout } from '@/features/buses/domain/bus-layout'
 import type { PassengerId } from '@/features/passengers/domain/ids'
 import type { Passenger } from '@/features/passengers/domain/passenger'
+import { resolvePassengerDisplayName } from '@/features/passengers/domain/passenger-display-name'
 import type { SeatId } from '@/features/seat-map/domain/ids'
 import { BusMap } from '@/features/seat-map/ui/BusMap'
 import {
@@ -212,9 +213,12 @@ export function OperationalBusMap({
               state,
             )
 
+          const passenger = state?.passengerId ? passengerById.get(state.passengerId) : undefined
+
           return (
             <OperationalSeatButton
-              passengerName={state?.passengerId ? passengerById.get(state.passengerId)?.name : undefined}
+              passengerFullName={passenger?.name}
+              passengerDisplayName={passenger ? resolvePassengerDisplayName(passenger) : undefined}
               isSelected={selectedSeatId === placement.element.id}
               isDimmed={!matchingSeatIds.has(placement.element.id)}
               placement={

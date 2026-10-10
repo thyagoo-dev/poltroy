@@ -8,7 +8,8 @@ import { cn } from '@/shared/lib/cn'
 interface OperationalSeatButtonProps {
   placement: LayoutElementPlacement
   status: SeatStatus
-  passengerName?: string
+  passengerFullName?: string
+  passengerDisplayName?: string
   isSelected?: boolean
   isDimmed?: boolean
   onClick: () => void
@@ -17,7 +18,8 @@ interface OperationalSeatButtonProps {
 export function OperationalSeatButton({
   placement,
   status,
-  passengerName,
+  passengerFullName,
+  passengerDisplayName,
   isSelected = false,
   isDimmed = false,
   onClick,
@@ -27,7 +29,7 @@ export function OperationalSeatButton({
 
   const visual = seatStatusVisuals[status]
   const StatusIcon = visual.icon
-  const relatedPassenger = status === 'OCCUPIED' || status === 'RESERVED' ? passengerName : undefined
+  const relatedPassenger = status === 'OCCUPIED' || status === 'RESERVED' ? passengerFullName : undefined
   const description = {
     FREE: 'livre',
     OCCUPIED: relatedPassenger ? `ocupada por ${relatedPassenger}` : 'ocupada, sem passageiro associado',
@@ -69,7 +71,7 @@ export function OperationalSeatButton({
       </span>
       <span className={cn('block w-full min-w-0 font-medium leading-4 text-foreground',
         relatedPassenger ? 'truncate text-[0.6875rem]' : 'whitespace-nowrap text-[0.625rem]')}>
-        {relatedPassenger ?? visual.label}
+        {relatedPassenger ? passengerDisplayName : visual.label}
       </span>
     </button>
   )

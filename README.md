@@ -79,7 +79,7 @@ Ao selecionar um arquivo, o POLTROY valida os dados e suas referências antes de
 
 Depois do sucesso, os contextos de ônibus e viagem são limpos e o aplicativo recarrega. O ônibus ativo pode ser selecionado novamente pelas regras normais da aplicação. Backup vazio é permitido; Cache Storage, Service Worker e preferências de UI não fazem parte do arquivo.
 
-O backup é JSON sem criptografia e pode conter nomes, telefones, observações e dados operacionais. Guarde-o em local seguro. Nenhum arquivo é enviado a servidores. A leitura aceita até 50 MiB; layouts importados têm limite de 100.000 células ocupadas para evitar expansão excessiva durante a validação.
+O backup é JSON sem criptografia e pode conter nomes, telefones, documentos de identificação, observações e dados operacionais. Guarde-o em local seguro. Nenhum arquivo é enviado a servidores. A leitura aceita até 50 MiB; layouts importados têm limite de 100.000 células ocupadas para evitar expansão excessiva durante a validação.
 
 ## Responsividade
 
@@ -102,3 +102,7 @@ O mapa usa uma única superfície de veículo e CSS Grid com corredores estreito
 ## Mapa operacional — Refino 15.3
 
 A aba Mapa é um workspace operacional único: sem viagem selecionada, apresenta o acesso a Viagens; viagens planejadas ou em andamento abrem o mapa de passageiros e estados. O resumo é compacto, a busca permanece visível e os seis filtros ficam em um dialog próprio. Selecionar ônibus na Frota mantém o usuário nessa página. Os componentes de mapa físico permanecem disponíveis, sem fallback automático na aba Mapa.
+
+## Passenger Data v2 — Refino 15.4
+
+Passageiros novos exigem nome completo e nome de exibição de até 16 pontos de código Unicode. CPF/RG são opcionais; CPF usa máscara na UI e dígitos no armazenamento. Registros legados usam os primeiros 16 caracteres do nome completo como fallback de apresentação, sem gravação automática. O schema Dexie permanece v1. Backups novos são v2, com importação de v1 convertida em memória e IDs/associações preservados.

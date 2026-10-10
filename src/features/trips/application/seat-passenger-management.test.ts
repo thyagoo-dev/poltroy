@@ -46,7 +46,7 @@ beforeEach(async () => {
   const seats = layout!.elements.filter((element) => element.kind === 'seat')
   seatId = seats[0].id
   secondSeatId = seats[1].id
-  passenger = await createPassenger({ name: 'João' }, dependencies.passengerRepository)
+  passenger = await createPassenger({ displayName: 'Pessoa', name: 'João' }, dependencies.passengerRepository)
 })
 afterEach(async () => { await database.delete() })
 
@@ -125,7 +125,7 @@ describe('Atribuição de passageiros aos assentos', () => {
     await setTripSeatStatus({ tripId: trip.id, seatId, status: 'RESERVED' }, dependencies)
     const assigned = await assign()
     expect(await assign()).toEqual(assigned)
-    const other = await createPassenger({ name: 'Maria' }, dependencies.passengerRepository)
+    const other = await createPassenger({ displayName: 'Pessoa', name: 'Maria' }, dependencies.passengerRepository)
     expect((await assign(seatId, other.id)).passengerId).toBe(other.id)
   })
 
