@@ -1,12 +1,14 @@
 import {
   useMemo,
   useState,
+  useRef,
   type FormEvent,
 } from 'react'
 
 import type { BusSummary } from '@/features/buses/application/list-buses'
 import type { BusId } from '@/features/buses/domain/ids'
 import type { Trip } from '@/features/trips/domain/trip'
+import { normalizeTripFields } from '@/features/trips/application/trip-input'
 import {
   fromDateTimeLocalInputValue,
   toDateTimeLocalInputValue,
@@ -57,6 +59,8 @@ export function TripForm({
   onSubmit,
   onCancel,
 }: TripFormProps) {
+  const submitting = useRef(false)
+  const [errorField, setErrorField] = useState<string | null>(null)
   const [
     busId,
     setBusId,
@@ -125,19 +129,22 @@ export function TripForm({
       FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault()
+    if (isSubmitting || submitting.current) return
+
+    function invalid(field: string, message: string) {
+      setValidationError(message)
+      setErrorField(field)
+      requestAnimationFrame(() => document.getElementById(`trip-${field}`)?.focus())
+    }
 
     if (!busId) {
-      setValidationError(
-        'Selecione um ônibus.',
-      )
+      invalid('bus', 'Selecione um ônibus.')
 
       return
     }
 
     if (!origin.trim()) {
-      setValidationError(
-        'Informe a origem.',
-      )
+      invalid('origin', 'Informe a origem.')
 
       return
     }
@@ -145,27 +152,26 @@ export function TripForm({
     if (
       !destination.trim()
     ) {
-      setValidationError(
-        'Informe o destino.',
-      )
+      invalid('destination', 'Informe o destino.')
 
       return
     }
 
     if (!departureAt) {
-      setValidationError(
-        'Informe a data e hora de saída.',
-      )
+      invalid('departure', 'Informe a data e hora de saída.')
 
       return
     }
 
+    let dateField = 'departure'
+    let normalizedFields: ReturnType<typeof normalizeTripFields>
     try {
       const normalizedDeparture =
         fromDateTimeLocalInputValue(
           departureAt,
         )
 
+      dateField = 'arrival'
       const normalizedArrival =
         arrivalEstimateAt
           ? fromDateTimeLocalInputValue(
@@ -173,24 +179,17 @@ export function TripForm({
             )
           : undefined
 
-      setValidationError(
-        null,
-      )
-
-      await onSubmit({
-        busId,
-
-        origin,
-        destination,
-
-        departureAt:
-          normalizedDeparture,
-
-        arrivalEstimateAt:
-          normalizedArrival,
-
-        notes,
-      })
+      dateField = origin.trim().localeCompare(destination.trim(), undefined, { sensitivity: 'base' }) === 0 ? 'destination' : 'arrival'
+      normalizedFields = normalizeTripFields({ origin, destination, departureAt: normalizedDeparture, arrivalEstimateAt: normalizedArrival, notes })
+    } catch (caughtError) {
+      invalid(dateField, caughtError instanceof Error ? caughtError.message : 'Verifique os dados informados.')
+      return
+    }
+    setValidationError(null)
+    setErrorField(null)
+    submitting.current = true
+    try {
+      await onSubmit({ busId, ...normalizedFields })
     } catch (
       caughtError
     ) {
@@ -200,6 +199,8 @@ export function TripForm({
           ? caughtError.message
           : 'Verifique os dados informados.',
       )
+    } finally {
+      submitting.current = false
     }
   }
 
@@ -207,17 +208,23 @@ export function TripForm({
     <form
       onSubmit={handleSubmit}
       className="space-y-5"
+      aria-busy={isSubmitting}
+      aria-describedby={validationError && !errorField ? 'trip-validation-error' : undefined}
     >
+      <fieldset disabled={isSubmitting} className="min-w-0 space-y-5">
       <div>
         <label
           htmlFor="trip-bus"
           className="text-sm font-semibold text-foreground"
         >
-          Ônibus
+          Ônibus *
         </label>
 
         <Select
           id="trip-bus"
+          autoFocus
+          aria-invalid={Boolean(validationError && errorField === 'bus')}
+          aria-describedby={validationError && errorField === 'bus' ? 'trip-validation-error' : undefined}
           className="mt-2"
           value={busId}
           onChange={(event) =>
@@ -283,11 +290,13 @@ export function TripForm({
             htmlFor="trip-origin"
             className="text-sm font-semibold text-foreground"
           >
-            Origem
+            Origem *
           </label>
 
           <Input
             id="trip-origin"
+            required aria-invalid={Boolean(validationError && errorField === 'origin')}
+            aria-describedby={validationError && errorField === 'origin' ? 'trip-validation-error' : undefined}
             className="mt-2"
             value={origin}
             onChange={(event) =>
@@ -306,11 +315,13 @@ export function TripForm({
             htmlFor="trip-destination"
             className="text-sm font-semibold text-foreground"
           >
-            Destino
+            Destino *
           </label>
 
           <Input
             id="trip-destination"
+            required aria-invalid={Boolean(validationError && errorField === 'destination')}
+            aria-describedby={validationError && errorField === 'destination' ? 'trip-validation-error' : undefined}
             className="mt-2"
             value={destination}
             onChange={(event) =>
@@ -331,11 +342,13 @@ export function TripForm({
             htmlFor="trip-departure"
             className="text-sm font-semibold text-foreground"
           >
-            Saída
+            Saída *
           </label>
 
           <Input
             id="trip-departure"
+            required aria-invalid={Boolean(validationError && errorField === 'departure')}
+            aria-describedby={validationError && errorField === 'departure' ? 'trip-validation-error' : undefined}
             className="mt-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary"
             type="datetime-local"
             value={departureAt}
@@ -357,6 +370,8 @@ export function TripForm({
 
           <Input
             id="trip-arrival"
+            aria-invalid={Boolean(validationError && errorField === 'arrival')}
+            aria-describedby={`trip-arrival-help${validationError && errorField === 'arrival' ? ' trip-validation-error' : ''}`}
             className="mt-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary"
             type="datetime-local"
             value={
@@ -369,7 +384,7 @@ export function TripForm({
             }
           />
 
-          <p className="mt-1.5 text-xs text-subtle">
+          <p id="trip-arrival-help" className="mt-1.5 text-xs text-subtle">
             Opcional
           </p>
         </div>
@@ -414,6 +429,7 @@ export function TripForm({
       {validationError && (
         <p
           role="alert"
+          id="trip-validation-error"
           className="
             rounded-control
             border border-danger/20
@@ -454,6 +470,7 @@ export function TripForm({
               : 'Salvar alterações'}
         </Button>
       </div>
+      </fieldset>
     </form>
   )
 }

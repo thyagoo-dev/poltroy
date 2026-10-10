@@ -64,6 +64,16 @@ select {
   scroll-margin-block: var(--poltroy-space-card);
 }
 
+a,
+[tabindex] {
+  scroll-margin-block: var(--poltroy-space-card);
+}
+
+/* Text fields need a visible boundary even when empty; decorative cards do not. */
+textarea {
+  border-color: var(--poltroy-color-control-border);
+}
+
 button:not(:disabled) {
   cursor: pointer;
 }

@@ -4,6 +4,8 @@ import {
 import {
   Fragment,
   useMemo,
+  useEffect,
+  useRef,
   useState,
   type CSSProperties,
   type ReactNode,
@@ -46,12 +48,24 @@ export function BusMap({
   showLayoutSummary = true,
   renderElement,
 }: BusMapProps) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [hasHorizontalScroll, setHasHorizontalScroll] = useState(false)
   const [
     selectedDeck,
     setSelectedDeck,
   ] = useState<
     number | null
   >(null)
+
+  useEffect(() => {
+    const scroller = scrollRef.current
+    if (!scroller) return
+    const update = () => setHasHorizontalScroll(scroller.scrollWidth > scroller.clientWidth)
+    const observer = new ResizeObserver(update)
+    observer.observe(scroller)
+    update()
+    return () => observer.disconnect()
+  }, [layout, selectedDeck])
 
   const layoutResult =
     useMemo(() => {
@@ -265,6 +279,10 @@ export function BusMap({
       </div>}
 
       <div
+        ref={scrollRef}
+        tabIndex={hasHorizontalScroll ? 0 : undefined}
+        role={hasHorizontalScroll ? 'region' : undefined}
+        aria-label={hasHorizontalScroll ? 'Mapa de assentos, rolagem horizontal' : undefined}
         className={cn((showLayoutSummary || model.decks.length > 1) && 'mt-4', `
           min-w-0
           overflow-x-auto [container-type:inline-size]

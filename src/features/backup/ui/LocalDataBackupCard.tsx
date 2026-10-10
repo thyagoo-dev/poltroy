@@ -121,11 +121,11 @@ export function LocalDataBackupCard() {
             <Download aria-hidden="true" size={17} />
             {busy === 'export' ? 'Exportando...' : 'Exportar backup'}
           </Button>
-          <Button id="select-backup-file" variant="secondary" disabled={busy !== null} onClick={() => fileInput.current?.click()}>
+          <Button id="select-backup-file" aria-controls="backup-file-input" variant="secondary" disabled={busy !== null} onClick={() => fileInput.current?.click()}>
             <Upload aria-hidden="true" size={17} />
             {busy === 'read' ? 'Validando...' : 'Restaurar backup'}
           </Button>
-          <input ref={fileInput} type="file" accept=".json,application/json" aria-label="Selecionar arquivo de backup" className="hidden" onChange={(event) => void handleFile(event)} />
+          <input id="backup-file-input" ref={fileInput} type="file" accept=".json,application/json" aria-label="Selecionar arquivo de backup" className="hidden" onChange={(event) => void handleFile(event)} />
         </div>
 
         <div role="status" aria-atomic="true" className="mt-3 text-sm text-primary">{feedback}</div>

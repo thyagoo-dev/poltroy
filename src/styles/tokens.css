@@ -11,6 +11,8 @@
 
   --poltroy-color-border: #e2e8f0;
   --poltroy-color-border-strong: #cbd5e1;
+  /* Field boundaries must remain identifiable against the light surfaces. */
+  --poltroy-color-control-border: #7c8a9e;
 
   --poltroy-color-foreground: #0f172a;
   --poltroy-color-muted: #475569;
@@ -120,6 +122,7 @@
 
   --color-border: var(--poltroy-color-border);
   --color-border-strong: var(--poltroy-color-border-strong);
+  --color-control-border: var(--poltroy-color-control-border);
 
   --color-foreground: var(--poltroy-color-foreground);
   --color-muted: var(--poltroy-color-muted);

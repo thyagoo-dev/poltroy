@@ -13,7 +13,7 @@ export function Input({
       className={cn(
         'min-h-11 min-w-0 w-full max-w-full',
         'rounded-control',
-        'border border-border',
+        'border border-control-border',
         'bg-surface-raised',
         'px-3.5',
         'text-sm text-foreground',
@@ -23,8 +23,7 @@ export function Input({
         'focus:border-primary',
         'focus:ring-2 focus:ring-primary',
         'disabled:cursor-not-allowed disabled:bg-surface-soft disabled:text-muted',
-        'aria-[invalid=true]:border-danger/60',
-        'aria-[invalid=true]:ring-danger/10',
+        'aria-[invalid=true]:border-danger',
         className,
       )}
       {...props}

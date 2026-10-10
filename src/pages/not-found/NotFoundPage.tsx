@@ -43,6 +43,7 @@ export function NotFoundPage() {
         </p>
 
         <h2
+          tabIndex={-1}
           className="
             mt-2
             text-2xl font-bold

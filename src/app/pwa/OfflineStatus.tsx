@@ -1,12 +1,20 @@
 import { WifiOff } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 import { useOnlineStatus } from '@/app/hooks/use-online-status'
 
 export function OfflineStatus() {
   const isOnline = useOnlineStatus()
+  const [hasBeenOffline, setHasBeenOffline] = useState(() => !navigator.onLine)
+  useEffect(() => {
+    const rememberOffline = () => setHasBeenOffline(true)
+    window.addEventListener('offline', rememberOffline)
+    return () => window.removeEventListener('offline', rememberOffline)
+  }, [])
 
   return (
     <div role="status" aria-atomic="true">
+      {isOnline && hasBeenOffline && <span className="sr-only">Conexão restabelecida. Os dados locais foram preservados.</span>}
       {!isOnline && (
         <div className="mb-4 flex items-start gap-3 rounded-control border border-warning/20 bg-warning/10 px-4 py-3 text-sm">
           <WifiOff aria-hidden="true" className="mt-0.5 shrink-0 text-warning" size={18} />

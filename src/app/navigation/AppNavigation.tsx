@@ -28,7 +28,7 @@ export function DesktopNavigation() {
                 'focus-visible:ring-2 focus-visible:ring-primary',
                 'motion-reduce:transition-none',
                 isActive
-                  ? 'bg-primary/5 text-primary!'
+                  ? 'bg-primary/5 text-primary! font-semibold underline decoration-2 underline-offset-4'
                   : 'text-muted! hover:bg-surface-soft hover:text-foreground!',
               )
             }
@@ -57,7 +57,7 @@ export function MobileNavigation() {
         z-[var(--poltroy-z-sticky)]
         w-[calc(100%-2rem)] max-w-[27.5rem]
         rounded-pill border border-border
-        bg-surface-raised p-2 shadow-raised
+        bg-surface-raised p-[8px] shadow-raised
         lg:hidden
       "
     >
@@ -73,7 +73,7 @@ export function MobileNavigation() {
               aria-label={item.label}
               className={({ isActive }) =>
                 cn(
-                  'flex min-h-11 min-w-11 shrink-0 items-center justify-center',
+                  'flex min-h-11 min-w-[44px] items-center justify-center',
                   'rounded-pill text-sm font-semibold',
                   'transition-[background-color,color,padding,gap]',
                   'duration-[var(--poltroy-duration-slow)] ease-[var(--poltroy-ease-standard)]',
@@ -81,8 +81,8 @@ export function MobileNavigation() {
                   'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-raised',
                   'motion-reduce:transition-none',
                   isActive
-                    ? 'gap-2 bg-primary px-3 text-on-primary! shadow-control'
-                    : 'gap-0 px-2 text-muted! hover:bg-surface-soft hover:text-foreground!',
+                    ? 'shrink gap-[8px] bg-primary px-[12px] text-on-primary! shadow-control'
+                    : 'shrink-0 gap-0 px-[8px] text-muted! hover:bg-surface-soft hover:text-foreground!',
                 )
               }
             >
@@ -98,11 +98,11 @@ export function MobileNavigation() {
                   <span
                     aria-hidden="true"
                     className={cn(
-                      'overflow-hidden whitespace-nowrap',
+                      'min-w-0 overflow-hidden',
                       'transition-[max-width,opacity]',
                       'duration-[var(--poltroy-duration-slow)] ease-[var(--poltroy-ease-standard)]',
                       'motion-reduce:transition-none',
-                      isActive ? 'max-w-28 opacity-100' : 'max-w-0 opacity-0',
+                      isActive ? 'max-w-28 whitespace-normal [overflow-wrap:anywhere] opacity-100' : 'max-w-0 whitespace-nowrap opacity-0',
                     )}
                   >
                     {item.label}

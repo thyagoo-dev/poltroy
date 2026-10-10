@@ -11,6 +11,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from 'react'
 
 import {
@@ -32,6 +33,7 @@ import { useTripOperationStore } from '@/features/trips/ui/trip-operation-store'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog'
+import { restoreFocus } from '@/shared/lib/restore-focus'
 
 type FormState =
   | {
@@ -44,6 +46,7 @@ type FormState =
   | null
 
 export function BusesPage() {
+  const formTrigger = useRef<HTMLElement | null>(null)
   const clearOperationalTrip = useTripOperationStore((state) => state.clearOperationalTrip)
 
   const activeBusId =
@@ -98,6 +101,18 @@ export function BusesPage() {
     setArchiveTarget,
   ] =
     useState<Bus | null>(null)
+
+  function openForm(next: NonNullable<FormState>) {
+    formTrigger.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    setFormState(next)
+  }
+
+  useEffect(() => {
+    if (!formState && formTrigger.current) {
+      restoreFocus(formTrigger.current)
+      formTrigger.current = null
+    }
+  }, [formState])
 
   const [
     error,
@@ -367,6 +382,7 @@ export function BusesPage() {
           </p>
 
           <h2
+            tabIndex={-1}
             id="buses-page-title"
             className="
               mt-2
@@ -386,8 +402,9 @@ export function BusesPage() {
 
         {!formState && (
           <Button
+            id="add-bus"
             onClick={() =>
-              setFormState({
+              openForm({
                 type: 'create',
               })
             }
@@ -402,7 +419,7 @@ export function BusesPage() {
         )}
       </div>
 
-      {error && (
+      {error && !archiveTarget && (
         <div
           role="alert"
           className="
@@ -509,7 +526,7 @@ export function BusesPage() {
             className="mt-4"
             padding="lg"
           >
-            <p className="text-sm text-muted">
+            <p role="status" className="text-sm text-muted">
               Carregando ônibus...
             </p>
           </Card>
@@ -551,7 +568,7 @@ export function BusesPage() {
             </div>
           </Card>
         ) : (
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <ul aria-label="Ônibus ativos" className="mt-4 grid gap-4 md:grid-cols-2">
             {activeBuses.map(
               ({
                 bus,
@@ -563,8 +580,8 @@ export function BusesPage() {
                   activeBusId
 
                 return (
-                  <Card
-                    key={bus.id}
+                  <li key={bus.id} className="min-w-0">
+                  <Card className="h-full"
                     variant={
                       selected
                         ? 'raised'
@@ -655,7 +672,7 @@ export function BusesPage() {
                         size="sm"
                         variant="secondary"
                         onClick={() =>
-                          setFormState({
+                          openForm({
                             type: 'edit',
                             bus,
                           })
@@ -704,10 +721,11 @@ export function BusesPage() {
                       </Button>
                     </div>
                   </Card>
+                  </li>
                 )
               },
             )}
-          </div>
+          </ul>
         )}
       </section>
 
@@ -732,14 +750,14 @@ export function BusesPage() {
             </span>
           </div>
 
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <ul aria-label="Ônibus arquivados" className="mt-4 grid gap-3 md:grid-cols-2">
             {archivedBuses.map(
               ({
                 bus,
                 seatCount,
               }) => (
-                <Card
-                  key={bus.id}
+                <li key={bus.id} className="min-w-0">
+                <Card className="h-full"
                   variant="soft"
                   padding="md"
                 >
@@ -779,9 +797,10 @@ export function BusesPage() {
                     </Button>
                   </div>
                 </Card>
+                </li>
               ),
             )}
-          </div>
+          </ul>
         </section>
       )}
 
@@ -797,6 +816,7 @@ export function BusesPage() {
         }
         confirmLabel="Arquivar"
         isPending={isSubmitting}
+        error={error}
         onCancel={() =>
           setArchiveTarget(null)
         }

@@ -13,7 +13,7 @@ export function Select({
       className={cn(
         'min-h-11 min-w-0 w-full max-w-full truncate',
         'rounded-control',
-        'border border-border',
+        'border border-control-border',
         'bg-surface-raised',
         'px-3.5',
         'text-sm text-foreground',

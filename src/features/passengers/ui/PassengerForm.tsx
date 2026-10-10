@@ -1,5 +1,5 @@
 import { IdCard, MessageSquare, Phone, User } from 'lucide-react'
-import { useId, useState, type FormEvent } from 'react'
+import { useId, useRef, useState, type FormEvent } from 'react'
 
 import { normalizePassengerFields, type PassengerInputFields } from '@/features/passengers/application/passenger-input'
 import type { Passenger, PassengerDocumentType } from '@/features/passengers/domain/passenger'
@@ -17,6 +17,7 @@ interface PassengerFormProps {
 
 export function PassengerForm({ passenger, isSubmitting, onSubmit, onCancel }: PassengerFormProps) {
   const id = useId()
+  const submitting = useRef(false)
   const [name, setName] = useState(passenger?.name ?? '')
   const [displayName, setDisplayName] = useState(passenger ? resolvePassengerDisplayName(passenger) : '')
   const [phone, setPhone] = useState(passenger?.phone ?? '')
@@ -25,33 +26,41 @@ export function PassengerForm({ passenger, isSubmitting, onSubmit, onCancel }: P
   const [notes, setNotes] = useState(passenger?.notes ?? '')
   const [error, setError] = useState<string | null>(null)
   const displayCount = countPassengerCharacters(displayName.trim())
+  const invalidField = !name.trim() ? 'name'
+    : !displayName.trim() || displayCount > PASSENGER_DISPLAY_NAME_MAX ? 'display-name'
+    : documentNumber.trim() && ((documentType === 'CPF' && normalizeCpfNumber(documentNumber).length !== 11)
+      || (documentType === 'RG' && countPassengerCharacters(documentNumber.trim()) > PASSENGER_RG_MAX)) ? 'document-number' : undefined
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (isSubmitting) return
+    if (isSubmitting || submitting.current) return
+    submitting.current = true
     setError(null)
     try {
       const values = normalizePassengerFields({ name, displayName, phone, documentType, documentNumber, notes })
       await onSubmit(values)
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : 'Não foi possível salvar o passageiro.')
+      if (invalidField) requestAnimationFrame(() => document.getElementById(`${id}-${invalidField}`)?.focus())
+    } finally {
+      submitting.current = false
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5" aria-busy={isSubmitting}>
+    <form onSubmit={handleSubmit} className="space-y-5" aria-busy={isSubmitting} aria-describedby={error && !invalidField ? `${id}-error` : undefined}>
       <div>
         <label htmlFor={`${id}-name`} className="inline-flex items-center gap-2 text-sm font-semibold"><User aria-hidden="true" size={15} />Nome completo *</label>
         <Input id={`${id}-name`} className="mt-2" autoComplete="name" autoFocus required
           value={name} onChange={(event) => setName(event.target.value)} disabled={isSubmitting}
-          aria-invalid={Boolean(error && !name.trim())} aria-describedby={error ? `${id}-error` : undefined} />
+          aria-invalid={Boolean(error && invalidField === 'name')} aria-describedby={error && invalidField === 'name' ? `${id}-error` : undefined} />
       </div>
       <div>
         <label htmlFor={`${id}-display-name`} className="text-sm font-semibold">Nome de exibição *</label>
         <Input id={`${id}-display-name`} className="mt-2" required value={displayName}
           onChange={(event) => setDisplayName(event.target.value)} disabled={isSubmitting}
           aria-invalid={displayCount > PASSENGER_DISPLAY_NAME_MAX || Boolean(error && !displayName.trim())}
-          aria-describedby={`${id}-display-help${error ? ` ${id}-error` : ''}`} />
+          aria-describedby={`${id}-display-help${error && invalidField === 'display-name' ? ` ${id}-error` : ''}`} />
         <p id={`${id}-display-help`} className="mt-1 flex flex-wrap justify-between gap-2 text-xs text-muted">
           <span>Como aparecerá no mapa</span><span>{displayCount}/{PASSENGER_DISPLAY_NAME_MAX}</span>
         </p>
@@ -65,7 +74,7 @@ export function PassengerForm({ passenger, isSubmitting, onSubmit, onCancel }: P
         <legend className="inline-flex items-center gap-2 text-sm font-semibold"><IdCard aria-hidden="true" size={15} />Identificação opcional</legend>
         <div className="mt-2 flex flex-wrap gap-2">
           {(['CPF', 'RG'] as const).map((value) => (
-            <label key={value} className="inline-flex min-h-11 items-center gap-2 rounded-control border border-border bg-surface px-3.5 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:text-primary has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary">
+            <label key={value} className="inline-flex min-h-11 items-center gap-2 rounded-control border border-control-border bg-surface px-3.5 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:text-primary has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary">
               <input type="radio" name={`${id}-document-type`} value={value} checked={documentType === value}
                 className="size-4 accent-primary" onChange={() => {
                   setDocumentType(value)
@@ -80,8 +89,9 @@ export function PassengerForm({ passenger, isSubmitting, onSubmit, onCancel }: P
           placeholder={documentType === 'CPF' ? '000.000.000-00' : `RG (até ${PASSENGER_RG_MAX} caracteres)`}
           value={documentType === 'CPF' ? formatCpf(documentNumber) : documentNumber}
           onChange={(event) => setDocumentNumber(documentType === 'CPF' ? normalizeCpfNumber(event.target.value).slice(0, 11) : event.target.value)}
-          aria-describedby={`${id}-document-help${error ? ` ${id}-error` : ''}`} />
-        <p id={`${id}-document-help`} className="mt-1 text-xs text-muted">Deixe o número vazio para não informar identificação.</p>
+          aria-invalid={Boolean(error && invalidField === 'document-number')}
+          aria-describedby={`${id}-document-help${error && invalidField === 'document-number' ? ` ${id}-error` : ''}`} />
+        <p id={`${id}-document-help`} className="mt-1 text-xs text-muted">{documentType === 'CPF' ? 'CPF: 11 dígitos.' : `RG: até ${PASSENGER_RG_MAX} caracteres.`} Deixe o número vazio para não informar identificação.</p>
         {documentNumber && <Button variant="ghost" size="sm" className="mt-1" onClick={() => setDocumentNumber('')}>Remover identificação</Button>}
       </fieldset>
       <div>

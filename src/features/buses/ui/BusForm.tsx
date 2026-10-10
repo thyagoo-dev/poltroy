@@ -1,5 +1,6 @@
 import {
   useState,
+  useRef,
   type FormEvent,
 } from 'react'
 
@@ -46,6 +47,7 @@ export function BusForm({
   onSubmit,
   onCancel,
 }: BusFormProps) {
+  const submitting = useRef(false)
   const [
     name,
     setName,
@@ -80,44 +82,49 @@ export function BusForm({
     event: FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault()
+    if (isSubmitting || submitting.current) return
 
     if (!name.trim()) {
       setValidationError(
         'Informe um nome para o ônibus.',
       )
+      requestAnimationFrame(() => document.getElementById('bus-name')?.focus())
 
       return
     }
 
     setValidationError(null)
 
-    await onSubmit({
+    submitting.current = true
+    try { await onSubmit({
       name,
       plate,
       model,
       presetId,
-    })
+    }) } finally { submitting.current = false }
   }
 
   return (
     <form
       onSubmit={handleSubmit}
       className="space-y-5"
+      aria-busy={isSubmitting}
     >
+      <fieldset disabled={isSubmitting} className="min-w-0 space-y-5">
       <div>
         <label
           htmlFor="bus-name"
           className="text-sm font-semibold text-foreground"
         >
-          Nome do ônibus
+          Nome do ônibus *
         </label>
 
-        <p className="mt-1 text-xs leading-5 text-muted">
+        <p id="bus-name-help" className="mt-1 text-xs leading-5 text-muted">
           Um nome fácil de reconhecer durante a operação.
         </p>
 
         <Input
-          id="bus-name" aria-describedby={validationError ? "bus-name-error" : undefined}
+          id="bus-name" required autoFocus aria-describedby={`bus-name-help${validationError ? ' bus-name-error' : ''}`}
           className="mt-2"
           value={name}
           onChange={(event) =>
@@ -193,12 +200,13 @@ export function BusForm({
             Configuração inicial
           </label>
 
-          <p className="mt-1 text-xs leading-5 text-muted">
+          <p id="bus-layout-help" className="mt-1 text-xs leading-5 text-muted">
             O layout poderá ser refinado posteriormente.
           </p>
 
           <Select
             id="bus-layout"
+            aria-describedby="bus-layout-help"
             className="mt-2"
             value={presetId}
             onChange={(event) =>
@@ -270,6 +278,7 @@ export function BusForm({
               : 'Salvar alterações'}
         </Button>
       </div>
+      </fieldset>
     </form>
   )
 }

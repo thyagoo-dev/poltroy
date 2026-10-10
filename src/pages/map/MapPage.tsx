@@ -106,7 +106,7 @@ export function MapPage() {
             "
             padding="lg"
           >
-            <p className="text-sm text-muted">
+            <p role="status" className="text-sm text-muted">
               Carregando viagem...
             </p>
           </Card>
@@ -139,9 +139,9 @@ export function MapPage() {
                 />
               </div>
 
-              <h3 className="mt-5 text-lg font-semibold text-foreground">
+              <h2 className="mt-5 text-lg font-semibold text-foreground">
                 Viagem indisponível
-              </h3>
+              </h2>
 
               <p role="alert" className="mt-2 text-sm leading-6 text-muted">
                 {operationalMap.error ??
@@ -202,7 +202,7 @@ export function MapPage() {
         <Card className="flex min-h-72 items-center justify-center" padding="lg">
           <div className="max-w-md text-center">
             <Route aria-hidden="true" size={27} className="mx-auto text-primary" />
-            <h3 className="mt-4 text-lg font-semibold">Nenhuma viagem aberta no mapa</h3>
+            <h2 className="mt-4 text-lg font-semibold">Nenhuma viagem aberta no mapa</h2>
             <p className="mt-2 text-sm leading-6 text-muted">
               Abra uma viagem planejada ou em andamento para visualizar assentos, passageiros e estados da operação.
             </p>

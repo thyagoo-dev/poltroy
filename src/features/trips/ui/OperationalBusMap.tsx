@@ -1,6 +1,7 @@
 import {
   useMemo,
   useState,
+  useRef,
 } from 'react'
 
 import type { BusLayout } from '@/features/buses/domain/bus-layout'
@@ -40,6 +41,7 @@ export function OperationalBusMap({
   onChangePassenger,
   onChangeStatus,
 }: OperationalBusMapProps) {
+  const changeInFlight = useRef(false)
   const [filter, setFilter] = useState<OperationalSeatFilter>('ALL')
   const [search, setSearch] = useState('')
   const [
@@ -125,6 +127,7 @@ export function OperationalBusMap({
     if (!selectedSeat) {
       return
     }
+    if (changeInFlight.current) return
 
     if (
       status ===
@@ -134,6 +137,7 @@ export function OperationalBusMap({
       return
     }
 
+    changeInFlight.current = true
     setIsPending(true)
     setError(null)
 
@@ -154,12 +158,14 @@ export function OperationalBusMap({
           : 'Não foi possível alterar o assento.',
       )
     } finally {
+      changeInFlight.current = false
       setIsPending(false)
     }
   }
 
   async function handlePassengerSelect(passengerId: PassengerId | null) {
-    if (!selectedSeat || isPending) return
+    if (!selectedSeat || isPending || changeInFlight.current) return
+    changeInFlight.current = true
     setIsPending(true)
     setError(null)
     try {
@@ -167,6 +173,7 @@ export function OperationalBusMap({
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : 'Não foi possível alterar o passageiro.')
     } finally {
+      changeInFlight.current = false
       setIsPending(false)
     }
   }

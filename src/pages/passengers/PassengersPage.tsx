@@ -61,6 +61,9 @@ export function PassengersPage() {
           value={query} onChange={(event) => setQuery(event.target.value)} />
       </div>
 
+      <p role="status" aria-atomic="true" className="sr-only">{!isLoading && !error && query.trim()
+        ? `${filtered.length} ${filtered.length === 1 ? 'passageiro encontrado' : 'passageiros encontrados'}.` : ''}</p>
+
       {isLoading ? <p role="status" className="mt-6 text-sm text-muted">Carregando passageiros...</p>
         : !error && filtered.length === 0 ? (
           <Card className="mt-6 text-center" padding="lg">

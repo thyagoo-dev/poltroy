@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   BusFront,
   Circle,
@@ -16,69 +16,51 @@ import {
   DesktopNavigation,
   MobileNavigation,
 } from '@/app/navigation/AppNavigation'
-import { navigationItems } from '@/app/navigation/navigation-items'
+import { getPassengerTitleId, getRoutePresentation } from '@/app/layouts/route-presentation'
+import { getPassengerAction } from '@/app/services/passenger-actions'
+import type { PassengerId } from '@/features/passengers/domain/ids'
 import { OfflineStatus } from '@/app/pwa/OfflineStatus'
 import { PwaUpdatePrompt } from '@/app/pwa/PwaUpdatePrompt'
 
-function getCurrentPageTitle(
-  pathname: string,
-) {
-  if (
-    pathname === '/buses' ||
-    pathname.startsWith(
-      '/buses/',
-    )
-  ) {
-    return 'Ônibus'
-  }
-
-  const currentNavigationItem =
-    navigationItems.find(
-      (item) => {
-        if (item.end) {
-          return (
-            pathname ===
-            item.path
-          )
-        }
-
-        return (
-          pathname ===
-            item.path ||
-          pathname.startsWith(
-            `${item.path}/`,
-          )
-        )
-      },
-    )
-
-  return (
-    currentNavigationItem?.label ??
-    'Poltroy'
-  )
-}
-
 export function AppShell() {
   const location = useLocation()
+  const mainRef = useRef<HTMLElement>(null)
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  const [passengerTitle, setPassengerTitle] = useState<{ pathname: string; name: string } | null>(null)
 
   const {
     activeBus,
     isLoading,
   } = useActiveBus()
 
-  const currentPageTitle =
-    getCurrentPageTitle(
-      location.pathname,
-    )
+  const { sectionTitle: currentPageTitle, documentTitle } = getRoutePresentation(location.pathname,
+    passengerTitle?.pathname === location.pathname ? passengerTitle.name : undefined)
 
   const busContext = getShellBusContext(location.pathname)
 
   useEffect(() => {
-    document.title =
-      currentPageTitle === 'Mapa'
-        ? 'Poltroy'
-        : `${currentPageTitle} · Poltroy`
-  }, [currentPageTitle])
+    document.title = documentTitle
+  }, [documentTitle])
+
+  useEffect(() => {
+    const id = getPassengerTitleId(location.pathname)
+    if (!id) return
+    let cancelled = false
+    void getPassengerAction(id as PassengerId).then((passenger) => {
+      if (!cancelled) setPassengerTitle({ pathname: location.pathname, name: passenger?.name ?? 'Passageiro não encontrado' })
+    }).catch(() => {
+      if (!cancelled) setPassengerTitle({ pathname: location.pathname, name: 'Cadastro do passageiro' })
+    })
+    return () => { cancelled = true }
+  }, [location.pathname])
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    // Preserve intentional field autofocus and the existing asynchronous page focus.
+    if (mainRef.current?.contains(document.activeElement) && document.activeElement !== mainRef.current) return
+    const target = mainRef.current?.querySelector<HTMLElement>('h2[tabindex="-1"]') ?? headingRef.current
+    target?.focus({ preventScroll: true })
+  }, [location.pathname, location.key])
 
   const activeBusLabel =
     isLoading
@@ -107,7 +89,12 @@ export function AppShell() {
         lg:grid-cols-[15.5rem_minmax(0,1fr)]
       "
     >
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[var(--poltroy-z-toast)] focus:rounded-control focus:bg-surface focus:px-4 focus:py-3 focus:font-semibold focus:text-primary focus:shadow-raised"
+        onClick={(event) => { event.preventDefault(); mainRef.current?.focus(); mainRef.current?.scrollIntoView({ block: 'start' }) }}>
+        Pular para o conteúdo
+      </a>
       <aside
+        aria-label="Área de navegação"
         className="
           hidden
           border-r border-border
@@ -195,7 +182,7 @@ export function AppShell() {
               px-[var(--poltroy-space-page-inline)]
             "
           >
-            <div className="min-w-0 shrink-0">
+            <div className="min-w-0">
               <p
                 className="
                   text-[0.6875rem] font-bold
@@ -208,6 +195,7 @@ export function AppShell() {
               </p>
 
               <h1
+                ref={headingRef} tabIndex={-1}
                 className="
                   truncate
                   text-lg font-semibold
@@ -242,6 +230,7 @@ export function AppShell() {
         </header>
 
         <main
+          id="main-content" ref={mainRef} tabIndex={-1}
           className="
             mx-auto
             min-h-[calc(100dvh-var(--poltroy-shell-header-height))]

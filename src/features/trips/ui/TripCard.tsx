@@ -80,6 +80,7 @@ export function TripCard({
 
   return (
     <Card
+      className="h-full"
       variant={
         trip.status ===
         'ACTIVE'

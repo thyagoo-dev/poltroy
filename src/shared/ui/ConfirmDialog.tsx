@@ -6,6 +6,7 @@ import {
 } from 'react'
 
 import { Button } from '@/shared/ui/Button'
+import { restoreFocus } from '@/shared/lib/restore-focus'
 
 interface ConfirmDialogProps {
   open: boolean
@@ -38,6 +39,7 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   const titleId = useId()
   const descriptionId = useId()
+  const returnTarget = useRef<HTMLElement | null>(null)
 
   const dialogRef =
     useRef<HTMLDialogElement>(
@@ -76,7 +78,9 @@ export function ConfirmDialog({
       open &&
       !dialog.open
     ) {
+      returnTarget.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
       dialog.showModal()
+      dialog.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true })
       return
     }
 
@@ -85,6 +89,7 @@ export function ConfirmDialog({
       dialog.open
     ) {
       dialog.close()
+      requestAnimationFrame(() => restoreFocus(returnTarget.current))
     }
   }, [open])
 

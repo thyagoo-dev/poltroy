@@ -70,7 +70,7 @@ export function OperationalSeatButton({
         </span>
       </span>
       <span className={cn('block w-full min-w-0 font-medium leading-4 text-foreground',
-        relatedPassenger ? 'truncate text-[0.6875rem]' : 'whitespace-nowrap text-[0.625rem]')}>
+        relatedPassenger ? 'truncate text-[0.6875rem]' : 'whitespace-normal break-words text-[0.625rem]')}>
         {relatedPassenger ? passengerDisplayName : visual.label}
       </span>
     </button>

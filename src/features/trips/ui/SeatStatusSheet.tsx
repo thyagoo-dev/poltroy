@@ -103,6 +103,7 @@ export function SeatStatusSheet({
       ref={dialogRef}
       aria-labelledby={seatLabelId + " " + titleId}
       aria-describedby={descriptionId}
+      aria-busy={isPending}
       onCancel={(event) => {
         event.preventDefault()
 

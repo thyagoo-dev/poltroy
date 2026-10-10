@@ -34,6 +34,7 @@ import { useBusSelectionStore } from '@/features/buses/ui/bus-selection-store'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog'
+import { restoreFocus } from '@/shared/lib/restore-focus'
 
 type FormState =
   | {
@@ -46,6 +47,7 @@ type FormState =
   | null
 
 export function TripsPage() {
+  const formTrigger = useRef<HTMLElement | null>(null)
   const tripActionInFlight = useRef(false)
   const [completeTarget, setCompleteTarget] = useState<Trip | null>(null)
   const navigate = useNavigate()
@@ -93,6 +95,13 @@ export function TripsPage() {
     setFormState,
   ] =
     useState<FormState>(null)
+
+  useEffect(() => {
+    if (!formState && formTrigger.current) {
+      restoreFocus(formTrigger.current)
+      formTrigger.current = null
+    }
+  }, [formState])
 
   const [
     cancelTarget,
@@ -394,6 +403,7 @@ export function TripsPage() {
   }
 
   function openForm(nextFormState: NonNullable<FormState>) {
+    formTrigger.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
     setError(null)
     setMessage(null)
     setFormState(nextFormState)
@@ -415,14 +425,12 @@ export function TripsPage() {
       readonly TripSummary[],
   ) {
     return (
-      <div className="mt-4 grid gap-4 md:grid-cols-2">
+      <ul aria-label="Viagens" className="mt-4 grid gap-4 md:grid-cols-2">
         {summaries.map(
           (summary) => (
+            <li key={summary.trip.id} className="min-w-0">
             <TripCard
               isPending={isSubmitting}
-              key={
-                summary.trip.id
-              }
               summary={
                 summary
               }
@@ -449,9 +457,10 @@ export function TripsPage() {
                 )
               }
             />
+            </li>
           ),
         )}
-      </div>
+      </ul>
     )
   }
 
@@ -473,6 +482,7 @@ export function TripsPage() {
           </p>
 
           <h2
+            tabIndex={-1}
             id="trips-page-title"
             className="
               mt-2
@@ -494,6 +504,7 @@ export function TripsPage() {
           activeBuses.length >
             0 && (
           <Button
+            id="new-trip"
             onClick={() =>
               openForm({
                 type: 'create',
@@ -510,7 +521,7 @@ export function TripsPage() {
         )}
       </div>
 
-      {error && (
+      {error && !completeTarget && !cancelTarget && (
         <div
           role="alert"
           className="
@@ -640,7 +651,7 @@ export function TripsPage() {
           className="mt-6"
           padding="lg"
         >
-          <p className="text-sm text-muted">
+          <p role="status" className="text-sm text-muted">
             Carregando viagens...
           </p>
         </Card>
@@ -785,6 +796,7 @@ export function TripsPage() {
             : ''
         }
         confirmLabel="Cancelar viagem"
+        error={error}
         isPending={
           isSubmitting
         }

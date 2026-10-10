@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { useRegisterPwa } from '@/app/pwa/use-register-pwa'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
+import { restoreFocus } from '@/shared/lib/restore-focus'
 
 export function PwaUpdatePrompt() {
   const { needRefresh: [needRefresh, setNeedRefresh], updateServiceWorker, registrationError } = useRegisterPwa()
@@ -40,7 +41,10 @@ export function PwaUpdatePrompt() {
             </div>
             {updateError && <p role="alert" className="mt-3 text-sm text-danger">{updateError}</p>}
             <div className="mt-4 flex flex-wrap justify-end gap-2">
-              <Button size="sm" variant="ghost" disabled={isUpdating} onClick={() => setNeedRefresh(false)}>Agora não</Button>
+              <Button size="sm" variant="ghost" disabled={isUpdating} onClick={() => {
+                setNeedRefresh(false)
+                requestAnimationFrame(() => restoreFocus(null))
+              }}>Agora não</Button>
               <Button size="sm" disabled={isUpdating} onClick={() => void handleUpdate()}>{isUpdating ? 'Atualizando...' : 'Atualizar'}</Button>
             </div>
           </section>
