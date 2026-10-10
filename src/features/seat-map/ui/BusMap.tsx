@@ -5,6 +5,7 @@ import {
   Fragment,
   useMemo,
   useState,
+  type CSSProperties,
   type ReactNode,
 } from 'react'
 
@@ -16,6 +17,7 @@ import {
 } from '@/features/seat-map/domain/layout-engine'
 import { LayoutElementView } from '@/features/seat-map/ui/LayoutElementView'
 import { structuralElementVisuals } from '@/features/seat-map/ui/layout-element-visuals'
+import { getLayoutColumnRoles, orientFrontElements } from '@/features/seat-map/ui/seat-map-presentation'
 import { cn } from '@/shared/lib/cn'
 
 interface BusMapProps {
@@ -55,7 +57,7 @@ export function BusMap({
         return {
           model:
             buildLayoutModel(
-              layout.elements,
+              orientFrontElements(layout.elements),
             ),
 
           error: null,
@@ -160,6 +162,18 @@ export function BusMap({
     return null
   }
 
+  const columnRoles = getLayoutColumnRoles(activeDeck)
+  const aisleCount = columnRoles.filter((role) => role === 'aisle').length
+  const seatColumnCount = Math.max(1, activeDeck.columnCount - aisleCount)
+  // The scroller is the query container. Its useful width minus the vehicle's
+  // 14px frame, gaps and aisle tracks is shared by seat tracks (44–76px).
+  const gridStyle = {
+    '--seat-map-seat-width': `clamp(2.75rem, calc((100cqw - 0.875rem - ${aisleCount} * var(--seat-map-aisle-width) - ${activeDeck.columnCount - 1} * var(--seat-map-gap)) / ${seatColumnCount}), 4.75rem)`,
+    gridTemplateColumns: columnRoles.map((role) => role === 'aisle'
+      ? 'var(--seat-map-aisle-width)' : 'var(--seat-map-seat-width)').join(' '),
+    gridAutoRows: 'var(--seat-map-row-height)',
+  } as CSSProperties
+
   const availableStructuralKinds =
     structuralElementOrder.filter(
       (kind) =>
@@ -184,19 +198,13 @@ export function BusMap({
         "
       >
         <div>
-          <p className="font-semibold text-foreground">
+          <h3 className="font-semibold text-foreground">
             {layout.name}
-          </p>
+          </h3>
 
           <p className="mt-1 text-sm text-muted">
             {activeDeck.seatCount}{' '}
             assentos
-            {' · '}
-            {activeDeck.rowCount}{' '}
-            linhas de grid
-            {' · '}
-            {activeDeck.columnCount}{' '}
-            colunas
           </p>
         </div>
 
@@ -241,7 +249,7 @@ export function BusMap({
                       'focus-visible:ring-2',
                       'focus-visible:ring-primary',
                       isActive
-                        ? 'bg-primary/10 text-primary'
+                        ? 'bg-primary/5 text-primary'
                         : 'text-muted hover:bg-surface-soft hover:text-foreground',
                     )}
                   >
@@ -256,21 +264,25 @@ export function BusMap({
 
       <div
         className="
-          mt-6
-          overflow-x-auto
+          mt-4 min-w-0
+          overflow-x-auto [container-type:inline-size]
           pb-2
+          [--seat-map-aisle-width:1.125rem]
+          [--seat-map-gap:0.375rem]
+          [--seat-map-row-height:4.25rem]
+          sm:[--seat-map-aisle-width:1.5rem]
+          sm:[--seat-map-gap:0.5rem]
+          sm:[--seat-map-row-height:4.5rem]
         "
       >
         <div
           className="
             mx-auto
             w-fit min-w-fit
-            rounded-[2.25rem]
+            rounded-sheet
             border border-border
             bg-surface
-            px-1 pb-5 pt-4
-            shadow-raised
-            xs:px-3 sm:px-5 sm:pb-6
+            px-1.5 pb-4 pt-3
           "
         >
           <div
@@ -308,18 +320,10 @@ export function BusMap({
 
           <div
             className="
-              mt-4 grid w-max
-              gap-2
-              [--seat-map-cell-size:clamp(2.75rem,12vw,3.5rem)]
-              sm:gap-2.5
+              mt-3 grid w-max
+              gap-[var(--seat-map-gap)]
             "
-            style={{
-              gridTemplateColumns:
-                `repeat(${activeDeck.columnCount}, var(--seat-map-cell-size))`,
-
-              gridAutoRows:
-                'var(--seat-map-cell-size)',
-            }}
+            style={gridStyle}
           >
             {activeDeck.placements.map(
               (placement) => (
@@ -359,9 +363,9 @@ export function BusMap({
               flex size-7
               items-center justify-center
               rounded-[0.55rem]
-              border border-seat-free/35
+              border border-border-strong
               bg-surface-raised
-              text-seat-free
+              text-muted
             "
           >
             <Armchair

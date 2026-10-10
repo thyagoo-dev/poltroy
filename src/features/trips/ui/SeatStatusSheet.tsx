@@ -56,6 +56,7 @@ export function SeatStatusSheet({
   const titleId = useId()
   const seatLabelId = useId()
   const descriptionId = useId()
+  const titleRef = useRef<HTMLHeadingElement>(null)
   const dialogRef =
     useRef<HTMLDialogElement>(
       null,
@@ -74,6 +75,10 @@ export function SeatStatusSheet({
       !dialog.open
     ) {
       dialog.showModal()
+      // Long names and short landscape viewports need the context visible first.
+      // The native dialog still owns modality and focus restoration on close.
+      titleRef.current?.focus({ preventScroll: true })
+      dialog.scrollTop = 0
       return
     }
 
@@ -89,6 +94,9 @@ export function SeatStatusSheet({
     seatStatusVisuals[
       currentStatus
     ]
+
+  const passenger = passengers.find((item) => item.id === passengerId)
+  const acceptsPassenger = currentStatus === 'OCCUPIED' || currentStatus === 'RESERVED'
 
   return (
     <dialog
@@ -122,25 +130,29 @@ export function SeatStatusSheet({
     >
       <div className="p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:p-6 sm:pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
         <p id={seatLabelId} className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-          Assento {seatNumber}
+          Poltrona {seatNumber}
         </p>
 
-        <h2 id={titleId} className="mt-2 text-xl font-semibold tracking-[-0.025em]">
-          Alterar estado
-        </h2>
+        <div aria-live="polite" aria-atomic="true">
+          <h2 ref={titleRef} tabIndex={-1} id={titleId} className="mt-2 break-words text-xl font-semibold tracking-[-0.025em]">
+            {passenger?.name ?? currentVisual.label}
+          </h2>
 
-        <p id={descriptionId} className="mt-2 text-sm text-muted">
-          Estado atual:{' '}
-          <span className="font-semibold text-foreground">
-            {
-              currentVisual.label
-            }
-          </span>
-        </p>
+          {passenger?.phone && <p className="mt-1 break-words text-sm text-muted">{passenger.phone}</p>}
+
+          <p id={descriptionId} className="mt-2 text-sm text-muted">
+            Situação:{' '}
+            <span className="font-semibold text-foreground">{currentVisual.label}</span>
+          </p>
+
+          {acceptsPassenger && !passenger && <p className="mt-2 text-sm text-muted">
+            {passengerId ? 'Passageiro associado não encontrado.' : 'Sem passageiro associado'}
+          </p>}
+        </div>
 
         <div
           role="group"
-          aria-label={`Estado do assento ${seatNumber}`}
+          aria-label={`Situação da poltrona ${seatNumber}`}
           className="mt-5 grid gap-2"
         >
           {statuses.map(
@@ -226,7 +238,7 @@ export function SeatStatusSheet({
           )}
         </div>
 
-        {open && (currentStatus === 'OCCUPIED' || currentStatus === 'RESERVED') && (
+        {open && acceptsPassenger && (
           <SeatPassengerSection key={seatNumber} passengers={passengers} passengerId={passengerId}
             isPending={isPending} onSelect={onSelectPassenger} />
         )}

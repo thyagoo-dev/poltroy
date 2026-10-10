@@ -1,6 +1,4 @@
-import {
-  Armchair,
-} from 'lucide-react'
+import { Armchair } from 'lucide-react'
 
 import type { LayoutElementPlacement } from '@/features/seat-map/domain/layout-engine'
 import type { SeatStatus } from '@/features/trips/domain/trip-seat-state'
@@ -8,101 +6,70 @@ import { seatStatusVisuals } from '@/features/trips/ui/seat-status-visuals'
 import { cn } from '@/shared/lib/cn'
 
 interface OperationalSeatButtonProps {
-  placement:
-    LayoutElementPlacement
-
+  placement: LayoutElementPlacement
   status: SeatStatus
+  passengerName?: string
+  isSelected?: boolean
   isDimmed?: boolean
-
   onClick: () => void
 }
 
 export function OperationalSeatButton({
   placement,
   status,
+  passengerName,
+  isSelected = false,
   isDimmed = false,
   onClick,
 }: OperationalSeatButtonProps) {
-  if (
-    placement.element.kind !==
-    'seat'
-  ) {
-    return null
-  }
+  const { element } = placement
+  if (element.kind !== 'seat') return null
 
-  const {
-    element,
-  } = placement
-
-  const visual =
-    seatStatusVisuals[
-      status
-    ]
-
-  const StatusIcon =
-    visual.icon
+  const visual = seatStatusVisuals[status]
+  const StatusIcon = visual.icon
+  const relatedPassenger = status === 'OCCUPIED' || status === 'RESERVED' ? passengerName : undefined
+  const description = {
+    FREE: 'livre',
+    OCCUPIED: relatedPassenger ? `ocupada por ${relatedPassenger}` : 'ocupada, sem passageiro associado',
+    RESERVED: relatedPassenger ? `reservada para ${relatedPassenger}` : 'reservada, sem passageiro associado',
+    BLOCKED: 'bloqueada',
+  }[status]
+  const accessibleName = `Poltrona ${element.seatNumber}, ${description}${isDimmed ? ', fora da busca ou filtro' : ''}`
 
   return (
     <button
       type="button"
       onClick={onClick}
-      aria-label={
-        `Assento ${element.seatNumber}, ${visual.label}${isDimmed ? ', fora da busca ou filtro' : ''}`
-      }
-      title={
-        `Assento ${element.seatNumber} · ${visual.label}`
-      }
+      aria-label={accessibleName}
+      aria-haspopup="dialog"
+      aria-expanded={isSelected}
+      title={accessibleName}
       style={{
-        gridRow:
-          `${placement.row} / span ${placement.rowSpan}`,
-
-        gridColumn:
-          `${placement.column} / span ${placement.columnSpan}`,
+        gridRow: `${placement.row} / span ${placement.rowSpan}`,
+        gridColumn: `${placement.column} / span ${placement.columnSpan}`,
       }}
       className={cn(
-        'relative',
-        'flex min-h-11 min-w-11',
-        'flex-col items-center justify-center',
-        'overflow-hidden',
-        'rounded-[0.9rem]',
-        'border',
-        'shadow-soft',
-        'transition-[transform,border-color,background-color,box-shadow,opacity]',
-        isDimmed && 'opacity-55 hover:opacity-100 focus-visible:opacity-100',
-        'hover:-translate-y-0.5',
-        'focus-visible:outline-none',
-        'focus-visible:ring-2',
-        'focus-visible:ring-primary',
-        'focus-visible:ring-offset-2',
-        'focus-visible:ring-offset-surface',
+        'flex min-h-11 min-w-11 flex-col justify-center gap-1 overflow-hidden px-0.5',
+        'rounded-control border',
+        'transition-[border-color,background-color,box-shadow,opacity]',
+        isDimmed && 'opacity-75 hover:opacity-100 focus-visible:opacity-100',
+        'hover:shadow-control',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+        'focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
         visual.className,
+        isSelected && 'border-primary! opacity-100! ring-2 ring-primary ring-offset-2 ring-offset-surface',
       )}
     >
-      <StatusIcon
-        aria-hidden="true"
-        className="
-          absolute
-          right-1.5 top-1.5
-          size-2.5
-        "
-        strokeWidth={2.4}
-      />
-
-      <Armchair
-        aria-hidden="true"
-        size={16}
-        strokeWidth={1.8}
-      />
-
-      <span
-        className="
-          mt-0.5
-          text-[0.6875rem]
-          font-bold
-          leading-none
-        "
-      >
-        {element.seatNumber}
+      <span className="flex items-center justify-between gap-1">
+        <Armchair aria-hidden="true" className="shrink-0" size={14} strokeWidth={1.8} />
+        <span className="flex items-center gap-0.5">
+          <StatusIcon aria-hidden="true" className="shrink-0" size={10} strokeWidth={2.4} />
+          <span className="text-sm font-bold text-foreground">{element.seatNumber}</span>
+        </span>
+      </span>
+      <span className={cn('block w-full min-w-0 font-medium leading-4 text-foreground',
+        relatedPassenger ? 'truncate text-[0.6875rem]' : 'whitespace-nowrap text-[0.625rem]')}>
+        {relatedPassenger ?? visual.label}
       </span>
     </button>
   )

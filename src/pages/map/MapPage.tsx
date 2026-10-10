@@ -215,11 +215,7 @@ export function MapPage() {
                 operationalMap.clearOperationalTrip()
               }} />
 
-            <Card
-              className="mt-4 p-3 sm:p-7"
-              variant="raised"
-              padding="none"
-            >
+            <div className="mt-6 min-w-0">
               <OperationalBusMap
                 passengers={operationalMap.passengers}
                 onChangePassenger={handleSeatPassengerChange}
@@ -238,7 +234,7 @@ export function MapPage() {
                   handleSeatStatusChange
                 }
               />
-            </Card>
+            </div>
           </>
         )
       ) : physicalMap.isLoading ? (
@@ -332,11 +328,7 @@ export function MapPage() {
         </Card>
       ) : (
         <>
-          <Card
-            className="mt-6 p-3 sm:p-7"
-            variant="raised"
-            padding="none"
-          >
+          <div className="mt-6 min-w-0">
             <BusMap
               key={physicalMap.activeLayout.id}
               layout={
@@ -344,7 +336,7 @@ export function MapPage() {
                   .activeLayout
               }
             />
-          </Card>
+          </div>
 
           <Card
             className="mt-4"

@@ -7,6 +7,7 @@ import type { SeatType } from '@/features/seat-map/domain/seat'
 import { createEntityId } from '@/shared/lib/create-entity-id'
 
 export type BusLayoutPresetId =
+  | 'conventional-46'
   | 'conventional-44'
   | 'executive-40'
   | 'sleeper-30'
@@ -34,6 +35,15 @@ export const busLayoutPresets: readonly BusLayoutPreset[] = [
     configuration: '2+2',
 
     seatCount: 44,
+    seatType: 'STANDARD',
+  },
+
+  {
+    id: 'conventional-46',
+    name: 'Convencional 2+2',
+    description: 'Configuração com 46 lugares e corredor central.',
+    configuration: '2+2',
+    seatCount: 46,
     seatType: 'STANDARD',
   },
 
@@ -165,7 +175,7 @@ function createTwoByTwoSeats(
     position: {
       deck: 1,
       row: 1,
-      column: 5,
+      column: 1,
     },
   })
 
@@ -179,7 +189,7 @@ function createTwoByTwoSeats(
     position: {
       deck: 1,
       row: 1,
-      column: 1,
+      column: 5,
     },
   })
 
@@ -262,7 +272,7 @@ function createTwoByOneSeats(
     position: {
       deck: 1,
       row: 1,
-      column: 4,
+      column: 1,
     },
   })
 
@@ -276,7 +286,7 @@ function createTwoByOneSeats(
     position: {
       deck: 1,
       row: 1,
-      column: 1,
+      column: 4,
     },
   })
 

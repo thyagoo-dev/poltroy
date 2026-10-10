@@ -56,34 +56,21 @@ export function LayoutElementView({
         className="
           relative
           flex min-h-11 min-w-11
-          flex-col items-center justify-center
+          flex-col justify-center gap-1 px-1
           overflow-hidden
           rounded-[0.9rem]
-          border border-seat-free/35
+          border border-border-strong
           bg-surface-raised
           text-foreground
-          shadow-soft
           disabled:cursor-default
           disabled:opacity-100
         "
       >
-        <Armchair
-          aria-hidden="true"
-          className="text-seat-free"
-          size={16}
-          strokeWidth={1.8}
-        />
-
-        <span
-          className="
-            mt-0.5
-            text-[0.6875rem]
-            font-bold
-            leading-none
-          "
-        >
-          {element.seatNumber}
+        <span className="flex items-center justify-between gap-1">
+          <Armchair aria-hidden="true" className="shrink-0 text-muted" size={14} strokeWidth={1.8} />
+          <span className="text-sm font-bold">{element.seatNumber}</span>
         </span>
+        <span className="truncate text-[0.625rem] leading-4 text-muted">{seatTypeLabel}</span>
       </button>
     )
   }
@@ -96,7 +83,7 @@ export function LayoutElementView({
   const Icon = visual.icon
 
   const accessibleLabel =
-    element.label
+    element.label && element.label !== visual.label
       ? `${visual.label}: ${element.label}`
       : visual.label
 
@@ -113,9 +100,9 @@ export function LayoutElementView({
         style={gridStyle}
         className="
           relative
-          min-h-11 min-w-8
+          min-h-11 min-w-0
           rounded-pill
-          bg-primary/[0.025]
+          bg-surface-soft/70
         "
       >
         <span
@@ -142,8 +129,8 @@ export function LayoutElementView({
       }
       style={gridStyle}
       className={cn(
-        'flex min-h-11 min-w-11',
-        'items-center justify-center',
+        'flex min-h-11 min-w-0 flex-col gap-1 px-1',
+        'items-center justify-center overflow-hidden',
         'rounded-control',
         'border border-border',
         'bg-surface-soft',
@@ -152,9 +139,10 @@ export function LayoutElementView({
     >
       <Icon
         aria-hidden="true"
-        size={19}
+        size={16}
         strokeWidth={1.7}
       />
+      <span className="max-w-full truncate text-[0.625rem] leading-4">{visual.label}</span>
     </div>
   )
 }

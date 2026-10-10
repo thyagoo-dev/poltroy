@@ -17,21 +17,12 @@ export function SeatPassengerSection({ passengers, passengerId, isPending, onSel
   const id = useId()
   const [query, setQuery] = useState('')
   const search = query.trim().toLocaleLowerCase()
-  const passenger = passengers.find((item) => item.id === passengerId)
   const filtered = passengers.filter((item) => item.name.toLocaleLowerCase().includes(search)
     || item.phone?.toLocaleLowerCase().includes(search))
 
   return (
     <section aria-labelledby={`${id}-title`} className="mt-5 border-t border-border pt-5">
-      <h3 id={`${id}-title`} className="font-semibold">Passageiro</h3>
-      <div aria-live="polite" className="mt-2 text-sm">
-        {passenger ? (
-          <>
-            <p className="break-words font-semibold">{passenger.name}</p>
-            {passenger.phone && <p className="mt-1 break-words text-muted">{passenger.phone}</p>}
-          </>
-        ) : <p className="text-muted">{passengerId ? 'Passageiro associado não encontrado.' : 'Sem passageiro associado'}</p>}
-      </div>
+      <h3 id={`${id}-title`} className="font-semibold">Associação de passageiro</h3>
       {passengerId && (
         <Button className="mt-3" variant="ghost" disabled={isPending} onClick={() => onSelect(null)}>Remover associação</Button>
       )}

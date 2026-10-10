@@ -85,7 +85,7 @@ O backup é JSON sem criptografia e pode conter nomes, telefones, observações 
 
 O layout permanece mobile-first e usa os breakpoints existentes: xs (480 px), sm (640 px), md (768 px), lg (1024 px), xl (1280 px) e 2xl (1536 px). As listas de ônibus, viagens e passageiros passam a duas colunas em md; a sidebar substitui a navegação floating em lg. A área de conteúdo tem largura máxima e Mais usa uma coluna de leitura mais compacta.
 
-Os mapas preservam CSS Grid e células entre 44 e 56 px. Os presets de 44, 40 e 30 lugares cabem em 320 px; layouts mais largos usam scroll horizontal apenas no mapa. Cards quebram conteúdo sem espaços, sem esconder overflow do documento.
+Os mapas preservam CSS Grid, com poltronas entre 44 e 76 px de largura e 68 a 72 px de altura. Os presets de 46, 44, 40 e 30 lugares cabem em 320 px; layouts mais largos usam scroll horizontal apenas no mapa. Cards quebram conteúdo sem espaços, sem esconder overflow do documento.
 
 Header, navegação, sidebar e dialogs respeitam safe areas. Dialogs e a prévia de backup têm scroll próprio limitado pela altura dinâmica (dvh). A adaptação usa CSS/Tailwind, sem estado JavaScript de viewport ou detecção de dispositivo. A ordem visual das ações acompanha a ordem do teclado.
 
@@ -94,3 +94,7 @@ Os tokens de altura do header e de espaço reservado à navegação também defi
 ## Identidade visual — Refino 15.1
 
 O POLTROY utiliza Light Mode como tema único: fundo slate-50 (#F8FAFC), superfícies brancas e primary blue-600 (#2563EB). Cores, bordas e sombras são centralizadas em tokens semânticos; textos terciários e status usam tons com contraste adequado. A navegação floating, os layouts responsivos e os fluxos offline permanecem preservados.
+
+## Mapa de assentos — Refino 15.2
+
+O mapa usa uma única superfície de veículo e CSS Grid com corredores estreitos derivados do layout. Poltronas operacionais mostram o passageiro associado ou a situação, com detalhes no sheet existente. O preset convencional de 46 lugares está disponível, mantendo 44 como padrão e os presets de 40/30. A orientação frontal é motorista à esquerda e entrada à direita; layouts legados recebem apenas normalização de apresentação, sem alterar IDs ou dados persistidos.

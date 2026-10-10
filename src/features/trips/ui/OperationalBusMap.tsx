@@ -276,6 +276,8 @@ export function OperationalBusMap({
 
           return (
             <OperationalSeatButton
+              passengerName={state?.passengerId ? passengerById.get(state.passengerId)?.name : undefined}
+              isSelected={selectedSeatId === placement.element.id}
               isDimmed={!matchingSeatIds.has(placement.element.id)}
               placement={
                 placement
