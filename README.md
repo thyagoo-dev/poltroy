@@ -63,13 +63,23 @@ pnpm build
 pnpm preview
 ```
 
-Abra a URL do preview online e aguarde o primeiro carregamento. Depois, teste o reload offline nas rotas internas. Em produção, sirva o aplicativo por HTTPS e configure o servidor para encaminhar rotas SPA a `index.html`.
+Abra `/poltroy/` na URL do preview online e aguarde o primeiro carregamento. Depois, teste o reload offline nas rotas internas. O GitHub Pages usa o recovery descrito abaixo para deep links online; outros servidores precisam encaminhar rotas SPA a `index.html`.
 
 O Cache Storage contém apenas os arquivos estáticos do aplicativo. Ônibus, viagens, passageiros e estados de assento continuam no IndexedDB/Dexie.
 
 A instalação fica em **Mais → Aplicativo**, quando oferecida pelo navegador. Novas versões mostram **Agora não / Atualizar**; o aplicativo só aplica a atualização após confirmação.
 
 O gerador de Service Worker do Workbox usa a distribuição oficial WASM do Rollup, via override do pnpm, para funcionar também em ambientes Windows que bloqueiam o módulo nativo. O bundler do Vite 8 permanece inalterado.
+
+## Deployment — GitHub Pages
+
+O destino de produção é `https://thyagoo-dev.github.io/poltroy/`, no repositório `thyagoo-dev/poltroy`. `pnpm dev` continua na raiz local `/`; `pnpm build` usa `/poltroy/`, e `pnpm preview` deve ser aberto nesse caminho. Router, assets, manifest e Service Worker usam essa base; o SW controla somente `/poltroy/`.
+
+O workflow `.github/workflows/deploy-pages.yml` roda em push na `main` ou execução manual. Usa Node 24 e pnpm 12.3.4, instala com lockfile congelado e executa testes, lint e build antes de publicar `dist` como artefato do Pages. Após revisar, fazer commit e push, confirme **Settings → Pages → Build and deployment → Source → GitHub Actions** no repositório, se ainda não estiver configurado. A publicação real depende dessa execução remota.
+
+Deep links com BrowserRouter usam `public/404.html`: uma rota ausente no servidor redireciona para a raiz da aplicação com `__poltroy_route`; o `index.html` restaura path, query e hash com `history.replaceState` antes do React iniciar. A URL final permanece limpa e a recuperação aceita somente caminhos internos da mesma origem.
+
+IndexedDB é associado à origem: dados de localhost não aparecem automaticamente no GitHub Pages. Para transportá-los, exporte um backup local e restaure manualmente na aplicação publicada.
 
 ## Backup e restauração
 

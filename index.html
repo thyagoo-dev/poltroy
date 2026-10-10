@@ -2,6 +2,27 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      // Recover a GitHub Pages deep link before BrowserRouter reads the URL.
+      (() => {
+        const base = '%BASE_URL%'
+        const current = new URL(location.href)
+        const route = current.searchParams.get('__poltroy_route')
+        if (current.pathname !== base || route === null) return
+
+        current.searchParams.delete('__poltroy_route')
+        let restored = current.pathname + current.search + current.hash
+        try {
+          const target = new URL(route, current.origin)
+          if (route.startsWith(base) && !route.includes('\\') && target.origin === current.origin && target.pathname.startsWith(base)) {
+            restored = target.pathname + target.search + target.hash
+          }
+        } catch {
+          // Discard malformed recovery input and keep the application root.
+        }
+        history.replaceState(history.state, '', restored)
+      })()
+    </script>
 
     <meta
       name="viewport"
@@ -18,8 +39,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="POLTROY" />
-    <link rel="icon" type="image/svg+xml" href="/poltroy.svg" />
-    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%poltroy.svg" />
+    <link rel="apple-touch-icon" href="%BASE_URL%icons/apple-touch-icon.png" />
 
     <title>Poltroy</title>
   </head>

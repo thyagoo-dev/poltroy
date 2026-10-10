@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>POLTROY — Abrindo página</title>
+    <script>
+      (() => {
+        // This public file is copied as-is, so it knows the Pages repository path.
+        const base = '/poltroy/'
+        if (!location.pathname.startsWith(base) || location.pathname === base || location.pathname === base + '404.html') return
+        const root = new URL(base, location.origin)
+        root.searchParams.set('__poltroy_route', location.pathname + location.search + location.hash)
+        location.replace(root.href)
+      })()
+    </script>
+  </head>
+  <body>
+    <p>Abrindo o POLTROY… <a href="/poltroy/">Ir para o início</a></p>
+  </body>
+</html>
