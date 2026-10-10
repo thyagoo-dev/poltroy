@@ -44,6 +44,11 @@ export async function startTrip(
     )
   }
 
+  const busTrips = await dependencies.tripRepository.listByBusId(trip.busId)
+  if (busTrips.some((other) => other.busId === trip.busId && other.id !== trip.id && other.status === 'ACTIVE')) {
+    throw new Error('Este ônibus já possui uma viagem em andamento.')
+  }
+
   const timestamp =
     toIsoTimestamp()
 

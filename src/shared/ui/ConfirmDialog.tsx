@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useLayoutEffect,
   useRef,
   useId,
 } from 'react'
@@ -16,6 +17,7 @@ interface ConfirmDialogProps {
   cancelLabel?: string
 
   isPending?: boolean
+  error?: string | null
 
   onConfirm: () => void
   onCancel: () => void
@@ -28,6 +30,7 @@ export function ConfirmDialog({
   confirmLabel = 'Confirmar',
   cancelLabel = 'Cancelar',
   isPending = false,
+  error,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -38,6 +41,26 @@ export function ConfirmDialog({
     useRef<HTMLDialogElement>(
       null,
     )
+
+  useLayoutEffect(() => {
+    const dialog = dialogRef.current
+    if (!dialog) return
+    function handleCancel(event: Event) {
+      event.preventDefault()
+      if (!isPending) onCancel()
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (dialog?.open && isPending && event.key === 'Escape') {
+        event.preventDefault()
+      }
+    }
+    dialog.addEventListener('cancel', handleCancel)
+    document.addEventListener('keydown', handleKeyDown, true)
+    return () => {
+      dialog.removeEventListener('cancel', handleCancel)
+      document.removeEventListener('keydown', handleKeyDown, true)
+    }
+  }, [isPending, onCancel])
 
   useEffect(() => {
     const dialog =
@@ -68,16 +91,10 @@ export function ConfirmDialog({
       ref={dialogRef}
       aria-labelledby={titleId}
       aria-describedby={descriptionId}
-      onCancel={(event) => {
-        event.preventDefault()
-
-        if (!isPending) {
-          onCancel()
-        }
-      }}
+      aria-busy={isPending}
       className="
         m-0 mt-auto
-        w-full max-w-none max-h-dvh
+        w-full max-w-none max-h-dvh overflow-y-auto
         rounded-t-sheet
         border border-border
         bg-surface
@@ -98,6 +115,8 @@ export function ConfirmDialog({
         <p id={descriptionId} className="mt-2 text-sm leading-6 text-muted">
           {description}
         </p>
+
+        {error && <p role="alert" className="mt-4 rounded-control border border-danger/20 bg-danger/10 px-3 py-2.5 text-sm text-danger">{error}</p>}
 
         <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button

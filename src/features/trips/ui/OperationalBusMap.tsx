@@ -14,6 +14,9 @@ import {
   type TripSeatState,
 } from '@/features/trips/domain/trip-seat-state'
 import type { Trip } from '@/features/trips/domain/trip'
+import { matchesOperationalSeatFilter, type OperationalSeatFilter } from '@/features/trips/domain/operational-seat-filter'
+import { summarizeOperationalSeats } from '@/features/trips/domain/operational-seat-summary'
+import { OperationalMapControls } from '@/features/trips/ui/OperationalMapControls'
 import { OperationalSeatButton } from '@/features/trips/ui/OperationalSeatButton'
 import { SeatStatusSheet } from '@/features/trips/ui/SeatStatusSheet'
 import { seatStatusVisuals } from '@/features/trips/ui/seat-status-visuals'
@@ -42,6 +45,8 @@ export function OperationalBusMap({
   onChangePassenger,
   onChangeStatus,
 }: OperationalBusMapProps) {
+  const [filter, setFilter] = useState<OperationalSeatFilter>('ALL')
+  const [search, setSearch] = useState('')
   const [
     selectedSeatId,
     setSelectedSeatId,
@@ -107,60 +112,24 @@ export function OperationalBusMap({
       selectedState,
     )
 
-  const occupiedCount =
-    states.filter(
-      (state) =>
-        state.status ===
-        'OCCUPIED',
-    ).length
+  const summary = useMemo(() => summarizeOperationalSeats(layout, states), [layout, states])
+  const passengerById = useMemo(() => new Map(passengers.map((passenger) => [passenger.id, passenger])), [passengers])
+  const matchingSeatIds = useMemo(() => new Set(seatElements.filter((seat) => {
+    const state = stateBySeatId.get(seat.id)
+    return matchesOperationalSeatFilter({
+      seat,
+      state,
+      passenger: state?.passengerId ? passengerById.get(state.passengerId) : undefined,
+      filter,
+      search,
+    })
+  }).map((seat) => seat.id)), [seatElements, stateBySeatId, passengerById, filter, search])
 
-  const reservedCount =
-    states.filter(
-      (state) =>
-        state.status ===
-        'RESERVED',
-    ).length
-
-  const blockedCount =
-    states.filter(
-      (state) =>
-        state.status ===
-        'BLOCKED',
-    ).length
-
-  const freeCount =
-    Math.max(
-      0,
-      seatElements.length -
-        occupiedCount -
-        reservedCount -
-        blockedCount,
-    )
-
-  const counters:
-    readonly [
-      SeatStatus,
-      number,
-    ][] = [
-    [
-      'FREE',
-      freeCount,
-    ],
-
-    [
-      'OCCUPIED',
-      occupiedCount,
-    ],
-
-    [
-      'RESERVED',
-      reservedCount,
-    ],
-
-    [
-      'BLOCKED',
-      blockedCount,
-    ],
+  const counters: readonly [SeatStatus, number][] = [
+    ['FREE', summary.free],
+    ['OCCUPIED', summary.occupied],
+    ['RESERVED', summary.reserved],
+    ['BLOCKED', summary.blocked],
   ]
 
   async function handleStatusSelect(
@@ -271,6 +240,18 @@ export function OperationalBusMap({
         )}
       </div>
 
+      <p className="mb-5 text-sm text-muted">
+        Com passageiro: <strong className="text-foreground">{summary.withPassenger}</strong>
+        {' · '}Sem passageiro: <strong className="text-foreground">{summary.withoutPassenger}</strong>
+        <span className="mt-1 block text-xs text-subtle">Entre os assentos ocupados ou reservados.</span>
+      </p>
+
+      <OperationalMapControls filter={filter} search={search} matchCount={matchingSeatIds.size}
+        onFilterChange={setFilter} onSearchChange={setSearch} onClear={() => {
+          setFilter('ALL')
+          setSearch('')
+        }} />
+
       <BusMap
         layout={layout}
         renderElement={(
@@ -295,6 +276,7 @@ export function OperationalBusMap({
 
           return (
             <OperationalSeatButton
+              isDimmed={!matchingSeatIds.has(placement.element.id)}
               placement={
                 placement
               }

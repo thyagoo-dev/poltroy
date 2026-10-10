@@ -18,6 +18,7 @@ import { Card } from '@/shared/ui/Card'
 
 interface TripCardProps {
   summary: TripSummary
+  isPending?: boolean
 
   onOpenMap: () => void
   onEdit: () => void
@@ -57,6 +58,7 @@ const statusClasses:
 
 export function TripCard({
   summary,
+  isPending = false,
   onOpenMap,
   onEdit,
   onStart,
@@ -189,7 +191,8 @@ export function TripCard({
           <div className="flex flex-wrap gap-2">
             <Button
               size="sm"
-              variant="secondary"
+              variant={trip.status === 'ACTIVE' ? 'primary' : 'secondary'}
+              disabled={isPending}
               onClick={
                 onOpenMap
               }
@@ -199,7 +202,7 @@ export function TripCard({
                 size={15}
               />
 
-              Abrir mapa
+              {trip.status === 'ACTIVE' ? 'Continuar operação' : 'Abrir mapa'}
             </Button>
 
             {trip.status ===
@@ -210,18 +213,20 @@ export function TripCard({
                   onClick={
                     onStart
                   }
+                  disabled={isPending}
                 >
                   <Play
                     aria-hidden="true"
                     size={15}
                   />
 
-                  Iniciar
+                  {isPending ? 'Aguarde...' : 'Iniciar'}
                 </Button>
 
                 <Button
                   size="sm"
                   variant="ghost"
+                  disabled={isPending}
                   onClick={
                     onEdit
                   }
@@ -243,6 +248,8 @@ export function TripCard({
                 onClick={
                   onComplete
                 }
+                variant="secondary"
+                disabled={isPending}
               >
                 <Check
                   aria-hidden="true"
@@ -256,6 +263,7 @@ export function TripCard({
             <Button
               size="sm"
               variant="danger"
+              disabled={isPending}
               onClick={
                 onCancel
               }

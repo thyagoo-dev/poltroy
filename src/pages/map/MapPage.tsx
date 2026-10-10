@@ -4,19 +4,29 @@ import {
   TriangleAlert,
 } from 'lucide-react'
 import { Link } from 'react-router'
+import { useRef, useState } from 'react'
 
 import { useActiveBusLayout } from '@/app/hooks/use-active-bus-layout'
 import { useOperationalTripMap } from '@/app/hooks/use-operational-trip-map'
-import { setTripSeatPassengerAction, setTripSeatStatusAction } from '@/app/services/trip-actions'
+import { completeTripAction, startTripAction, setTripSeatPassengerAction, setTripSeatStatusAction } from '@/app/services/trip-actions'
 import type { PassengerId } from '@/features/passengers/domain/ids'
 import type { SeatId } from '@/features/seat-map/domain/ids'
 import { BusMap } from '@/features/seat-map/ui/BusMap'
 import type { SeatStatus } from '@/features/trips/domain/trip-seat-state'
 import { OperationalBusMap } from '@/features/trips/ui/OperationalBusMap'
+import { OperationalTripPanel } from '@/features/trips/ui/OperationalTripPanel'
+import type { Trip } from '@/features/trips/domain/trip'
+import { useBusSelectionStore } from '@/features/buses/ui/bus-selection-store'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog'
 
 export function MapPage() {
+  const [pendingAction, setPendingAction] = useState<'start' | 'complete' | null>(null)
+  const [tripActionError, setTripActionError] = useState<string | null>(null)
+  const [completeTarget, setCompleteTarget] = useState<Trip | null>(null)
+  const tripActionInFlight = useRef(false)
+  const selectBus = useBusSelectionStore((state) => state.selectBus)
   const physicalMap =
     useActiveBusLayout()
 
@@ -50,7 +60,7 @@ export function MapPage() {
 
   const pageDescription =
     operationalMap.trip
-      ? `${operationalMap.trip.origin} → ${operationalMap.trip.destination}.`
+      ? 'Prepare os assentos e acompanhe a operação da viagem.'
       : physicalMap.activeBus
         ? `Visualização estrutural de ${physicalMap.activeBus.name}.`
         : 'Selecione um ônibus para visualizar sua configuração.'
@@ -59,6 +69,40 @@ export function MapPage() {
     if (!operationalMap.trip) return
     await setTripSeatPassengerAction({ tripId: operationalMap.trip.id, seatId, passengerId })
     operationalMap.refresh()
+  }
+
+  async function handleStartTrip() {
+    if (!operationalMap.trip || tripActionInFlight.current) return
+    tripActionInFlight.current = true
+    setPendingAction('start')
+    setTripActionError(null)
+    try {
+      const updatedTrip = await startTripAction(operationalMap.trip.id)
+      selectBus(updatedTrip.busId)
+      operationalMap.refresh(updatedTrip)
+    } catch (caughtError) {
+      setTripActionError(caughtError instanceof Error ? caughtError.message : 'Não foi possível iniciar a viagem.')
+    } finally {
+      tripActionInFlight.current = false
+      setPendingAction(null)
+    }
+  }
+
+  async function handleCompleteTrip() {
+    if (!completeTarget || tripActionInFlight.current) return
+    tripActionInFlight.current = true
+    setPendingAction('complete')
+    setTripActionError(null)
+    try {
+      await completeTripAction(completeTarget.id)
+      setCompleteTarget(null)
+      operationalMap.clearOperationalTrip()
+    } catch (caughtError) {
+      setTripActionError(caughtError instanceof Error ? caughtError.message : 'Não foi possível concluir a viagem.')
+    } finally {
+      tripActionInFlight.current = false
+      setPendingAction(null)
+    }
   }
 
   return (
@@ -142,7 +186,7 @@ export function MapPage() {
                 Viagem indisponível
               </h3>
 
-              <p className="mt-2 text-sm leading-6 text-muted">
+              <p role="alert" className="mt-2 text-sm leading-6 text-muted">
                 {operationalMap.error ??
                   'Não foi possível carregar esta viagem.'}
               </p>
@@ -161,77 +205,15 @@ export function MapPage() {
           </Card>
         ) : (
           <>
-            <Card
-              className="mt-6"
-              padding="md"
-            >
-              <div
-                className="
-                  flex flex-col gap-4
-                  sm:flex-row
-                  sm:items-center
-                  sm:justify-between
-                "
-              >
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-semibold text-foreground">
-                      {
-                        operationalMap
-                          .trip.origin
-                      }
-                      {' → '}
-                      {
-                        operationalMap
-                          .trip.destination
-                      }
-                    </p>
-
-                    <span
-                      className="
-                        rounded-pill
-                        border border-success/20
-                        bg-success/10
-                        px-2 py-1
-                        text-[0.625rem]
-                        font-bold uppercase
-                        tracking-[0.08em]
-                        text-success
-                      "
-                    >
-                      {operationalMap
-                        .trip.status ===
-                      'ACTIVE'
-                        ? 'Em andamento'
-                        : 'Planejada'}
-                    </span>
-                  </div>
-
-                  <p className="mt-1 text-sm text-muted">
-                    {
-                      operationalMap
-                        .bus.name
-                    }
-                    {' · '}
-                    {
-                      operationalMap
-                        .layout.name
-                    }
-                  </p>
-                </div>
-
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={
-                    operationalMap
-                      .clearOperationalTrip
-                  }
-                >
-                  Sair da viagem
-                </Button>
-              </div>
-            </Card>
+            <OperationalTripPanel trip={operationalMap.trip} bus={operationalMap.bus} layout={operationalMap.layout}
+              pendingAction={pendingAction} error={tripActionError} onStart={() => void handleStartTrip()}
+              onComplete={() => {
+                setTripActionError(null)
+                setCompleteTarget(operationalMap.trip ?? null)
+              }} onExit={() => {
+                setTripActionError(null)
+                operationalMap.clearOperationalTrip()
+              }} />
 
             <Card
               className="mt-4"
@@ -381,6 +363,13 @@ export function MapPage() {
           </Card>
         </>
       )}
+      <ConfirmDialog open={completeTarget !== null} title="Concluir viagem?"
+        description={completeTarget ? `${completeTarget.origin} → ${completeTarget.destination} será movida para o histórico e o mapa deixará de ser editável.` : ''}
+        confirmLabel="Concluir viagem" cancelLabel="Voltar" isPending={pendingAction === 'complete'} error={tripActionError}
+        onConfirm={() => void handleCompleteTrip()} onCancel={() => {
+          setCompleteTarget(null)
+          setTripActionError(null)
+        }} />
     </div>
   )
 }

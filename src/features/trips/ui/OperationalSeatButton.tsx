@@ -12,6 +12,7 @@ interface OperationalSeatButtonProps {
     LayoutElementPlacement
 
   status: SeatStatus
+  isDimmed?: boolean
 
   onClick: () => void
 }
@@ -19,6 +20,7 @@ interface OperationalSeatButtonProps {
 export function OperationalSeatButton({
   placement,
   status,
+  isDimmed = false,
   onClick,
 }: OperationalSeatButtonProps) {
   if (
@@ -45,7 +47,7 @@ export function OperationalSeatButton({
       type="button"
       onClick={onClick}
       aria-label={
-        `Assento ${element.seatNumber}, ${visual.label}`
+        `Assento ${element.seatNumber}, ${visual.label}${isDimmed ? ', fora da busca ou filtro' : ''}`
       }
       title={
         `Assento ${element.seatNumber} · ${visual.label}`
@@ -65,7 +67,8 @@ export function OperationalSeatButton({
         'rounded-[0.9rem]',
         'border',
         'shadow-soft',
-        'transition-[transform,border-color,background-color,box-shadow]',
+        'transition-[transform,border-color,background-color,box-shadow,opacity]',
+        isDimmed && 'opacity-55 hover:opacity-100 focus-visible:opacity-100',
         'hover:-translate-y-0.5',
         'focus-visible:outline-none',
         'focus-visible:ring-2',

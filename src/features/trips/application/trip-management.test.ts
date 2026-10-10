@@ -334,6 +334,40 @@ function createPlannedTrip(
 describe(
   'trip management',
   () => {
+    it('rejeita iniciar outra viagem do mesmo ônibus enquanto houver ACTIVE', async () => {
+      const active = createPlannedTrip({ status: 'ACTIVE' })
+      const planned = createPlannedTrip({ id: 'trip-2' as TripId })
+      const repositories = createRepositories([active, planned])
+      await expect(startTrip(planned.id, repositories)).rejects.toThrow('Este ônibus já possui uma viagem em andamento.')
+      expect(await repositories.tripRepository.getById(planned.id)).toEqual(planned)
+      expect(await repositories.tripRepository.getById(active.id)).toEqual(active)
+    })
+
+    it('permite ACTIVE simultâneas para ônibus diferentes', async () => {
+      const active = createPlannedTrip({ status: 'ACTIVE' })
+      const planned = createPlannedTrip({ id: 'trip-2' as TripId, busId: secondBusId, layoutId: secondLayoutId })
+      const repositories = createRepositories([active, planned])
+      expect((await startTrip(planned.id, repositories)).status).toBe('ACTIVE')
+      expect((await repositories.tripRepository.getById(active.id))?.status).toBe('ACTIVE')
+    })
+
+    it.each(['COMPLETED', 'CANCELLED'] as const)('permite iniciar quando a outra viagem do ônibus está %s', async (status) => {
+      const historical = createPlannedTrip({ status })
+      const planned = createPlannedTrip({ id: 'trip-2' as TripId })
+      const repositories = createRepositories([historical, planned])
+      expect((await startTrip(planned.id, repositories)).status).toBe('ACTIVE')
+      expect(await repositories.tripRepository.getById(historical.id)).toEqual(historical)
+    })
+
+    it('permite várias viagens planejadas para o mesmo ônibus', async () => {
+      const repositories = createRepositories()
+      const input = { busId, origin: 'Iguatu', destination: 'Fortaleza', departureAt: '2026-10-10T08:00:00.000Z' }
+      const first = await createTrip(input, repositories)
+      const second = await createTrip({ ...input, departureAt: '2026-10-10T15:00:00.000Z' }, repositories)
+      expect((await startTrip(first.id, repositories)).status).toBe('ACTIVE')
+      expect((await repositories.tripRepository.getById(second.id))?.status).toBe('PLANNED')
+    })
+
     it(
       'cria uma viagem usando o layout ativo do ônibus',
       async () => {

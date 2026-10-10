@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react'
 import { Link, useNavigate } from 'react-router'
@@ -22,6 +23,7 @@ import {
 import type { BusSummary } from '@/features/buses/application/list-buses'
 import type { TripSummary } from '@/features/trips/application/list-trips'
 import type { Trip } from '@/features/trips/domain/trip'
+import { compareTripsByDeparture, compareTripsByHistory } from '@/features/trips/domain/trip-ordering'
 import {
   TripForm,
   type TripFormValues,
@@ -44,6 +46,8 @@ type FormState =
   | null
 
 export function TripsPage() {
+  const tripActionInFlight = useRef(false)
+  const [completeTarget, setCompleteTarget] = useState<Trip | null>(null)
   const navigate = useNavigate()
   const operationalTripId = useTripOperationStore((state) => state.operationalTripId)
   const selectOperationalTrip = useTripOperationStore((state) => state.selectOperationalTrip)
@@ -181,7 +185,7 @@ export function TripsPage() {
           ({ trip }) =>
             trip.status ===
             'ACTIVE',
-        ),
+        ).sort((a, b) => compareTripsByDeparture(a.trip, b.trip)),
       [trips],
     )
 
@@ -192,7 +196,7 @@ export function TripsPage() {
           ({ trip }) =>
             trip.status ===
             'PLANNED',
-        ),
+        ).sort((a, b) => compareTripsByDeparture(a.trip, b.trip)),
       [trips],
     )
 
@@ -205,7 +209,7 @@ export function TripsPage() {
               'COMPLETED' ||
             trip.status ===
               'CANCELLED',
-        ),
+        ).sort((a, b) => compareTripsByHistory(a.trip, b.trip)),
       [trips],
     )
 
@@ -280,6 +284,9 @@ export function TripsPage() {
   async function handleStart(
     trip: Trip,
   ) {
+    if (tripActionInFlight.current || isSubmitting) return
+    tripActionInFlight.current = true
+    setIsSubmitting(true)
     setError(null)
     setMessage(null)
 
@@ -295,11 +302,7 @@ export function TripsPage() {
 
       selectOperationalTrip(updatedTrip.id)
 
-      setMessage(
-        'Viagem iniciada. O ônibus da viagem foi selecionado para a operação.',
-      )
-
-      await loadData()
+      navigate('/')
     } catch (
       caughtError
     ) {
@@ -309,12 +312,17 @@ export function TripsPage() {
           ? caughtError.message
           : 'Não foi possível iniciar a viagem.',
       )
+    } finally {
+      tripActionInFlight.current = false
+      setIsSubmitting(false)
     }
   }
 
-  async function handleComplete(
-    trip: Trip,
-  ) {
+  async function handleComplete() {
+    if (!completeTarget || tripActionInFlight.current || isSubmitting) return
+    const trip = completeTarget
+    tripActionInFlight.current = true
+    setIsSubmitting(true)
     setError(null)
     setMessage(null)
 
@@ -324,6 +332,7 @@ export function TripsPage() {
       )
 
       if (operationalTripId === trip.id) clearOperationalTrip()
+      setCompleteTarget(null)
 
       setMessage(
         'Viagem concluída.',
@@ -339,14 +348,18 @@ export function TripsPage() {
           ? caughtError.message
           : 'Não foi possível concluir a viagem.',
       )
+    } finally {
+      tripActionInFlight.current = false
+      setIsSubmitting(false)
     }
   }
 
   async function handleCancel() {
-    if (!cancelTarget) {
+    if (!cancelTarget || tripActionInFlight.current || isSubmitting) {
       return
     }
 
+    tripActionInFlight.current = true
     setIsSubmitting(true)
     setError(null)
     setMessage(null)
@@ -375,6 +388,7 @@ export function TripsPage() {
           : 'Não foi possível cancelar a viagem.',
       )
     } finally {
+      tripActionInFlight.current = false
       setIsSubmitting(false)
     }
   }
@@ -405,6 +419,7 @@ export function TripsPage() {
         {summaries.map(
           (summary) => (
             <TripCard
+              isPending={isSubmitting}
               key={
                 summary.trip.id
               }
@@ -424,11 +439,10 @@ export function TripsPage() {
                   summary.trip,
                 )
               }
-              onComplete={() =>
-                void handleComplete(
-                  summary.trip,
-                )
-              }
+              onComplete={() => {
+                setError(null)
+                setCompleteTarget(summary.trip)
+              }}
               onCancel={() =>
                 setCancelTarget(
                   summary.trip,
@@ -751,6 +765,14 @@ export function TripsPage() {
           )}
         </>
       )}
+
+      <ConfirmDialog open={completeTarget !== null} title="Concluir viagem?"
+        description={completeTarget ? `${completeTarget.origin} → ${completeTarget.destination} será movida para o histórico e o mapa deixará de ser editável.` : ''}
+        confirmLabel="Concluir viagem" cancelLabel="Voltar" isPending={isSubmitting} error={error}
+        onConfirm={() => void handleComplete()} onCancel={() => {
+          setCompleteTarget(null)
+          setError(null)
+        }} />
 
       <ConfirmDialog
         open={

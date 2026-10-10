@@ -29,7 +29,12 @@ export function useOperationalTripMap() {
   const clearOperationalTrip = useTripOperationStore((state) => state.clearOperationalTrip)
   const [mapState, setMapState] = useState<OperationalMapState>()
   const [revision, setRevision] = useState(0)
-  const refresh = useCallback(() => setRevision((current) => current + 1), [])
+  const refresh = useCallback((updatedTrip?: Trip) => {
+    if (updatedTrip) {
+      setMapState((current) => current?.id === updatedTrip.id ? { ...current, trip: updatedTrip } : current)
+    }
+    setRevision((current) => current + 1)
+  }, [])
 
   useEffect(() => {
     if (!operationalTripId) return
