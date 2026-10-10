@@ -3,8 +3,11 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 
 import { listPassengersAction } from '@/app/services/passenger-actions'
+import { listPassengerOperationalAssignmentsAction } from '@/app/services/trip-actions'
+import type { PassengerId } from '@/features/passengers/domain/ids'
 import type { Passenger } from '@/features/passengers/domain/passenger'
-import { resolvePassengerDisplayName } from '@/features/passengers/domain/passenger-display-name'
+import { PassengerListCard } from '@/features/passengers/ui/PassengerListCard'
+import type { PassengerOperationalAssignment } from '@/features/trips/application/list-passenger-operational-assignments'
 import { matchesPassengerSearch } from '@/features/passengers/domain/passenger-search'
 import { Card } from '@/shared/ui/Card'
 import { Input } from '@/shared/ui/Input'
@@ -14,16 +17,19 @@ export function PassengersPage() {
   const [query, setQuery] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [assignments, setAssignments] = useState<ReadonlyMap<PassengerId, PassengerOperationalAssignment>>(new Map())
+  const [assignmentWarning, setAssignmentWarning] = useState(false)
   const headingRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
     let cancelled = false
-    void listPassengersAction().then((result) => {
-      if (!cancelled) setPassengers(result)
-    }).catch(() => {
-      if (!cancelled) setError('Não foi possível carregar os passageiros.')
-    }).finally(() => {
-      if (!cancelled) setIsLoading(false)
+    void Promise.allSettled([listPassengersAction(), listPassengerOperationalAssignmentsAction()]).then(([people, operational]) => {
+      if (cancelled) return
+      if (people.status === 'fulfilled') setPassengers(people.value)
+      else setError('Não foi possível carregar os passageiros.')
+      if (operational.status === 'fulfilled') setAssignments(operational.value)
+      else setAssignmentWarning(true)
+      setIsLoading(false)
     })
     return () => { cancelled = true }
   }, [])
@@ -47,6 +53,7 @@ export function PassengersPage() {
       </section>
 
       {error && <p role="alert" className="mt-4 text-sm text-danger">{error}</p>}
+      {!error && assignmentWarning && <p role="status" className="mt-4 text-sm text-muted">Não foi possível carregar ônibus e assentos. Os dados dos passageiros continuam disponíveis.</p>}
 
       <div className="mt-6">
         <label htmlFor="passenger-search" className="text-sm font-semibold">Buscar passageiros</label>
@@ -65,13 +72,7 @@ export function PassengersPage() {
           <ul aria-label="Passageiros cadastrados" className="mt-4 grid gap-3 md:grid-cols-2">
             {filtered.map((passenger) => (
               <li key={passenger.id} className="min-w-0">
-                <Card padding="md" className="h-full">
-                  <h3 className="break-words font-semibold">{passenger.name}</h3>
-                  <p className="mt-1 break-words text-xs text-subtle">No mapa: {resolvePassengerDisplayName(passenger)}</p>
-                  {passenger.phone && <p className="mt-1 break-words text-sm text-muted">{passenger.phone}</p>}
-                  <Link to={`/passengers/${encodeURIComponent(passenger.id)}`} aria-label={`Ver detalhes de ${passenger.name}`}
-                    className="mt-4 inline-flex min-h-11 items-center justify-center rounded-control border border-border bg-surface-raised px-3.5 py-2 text-sm font-semibold text-foreground! shadow-soft hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">Ver passageiro</Link>
-                </Card>
+                <PassengerListCard passenger={passenger} assignment={assignments.get(passenger.id)} />
               </li>
             ))}
           </ul>

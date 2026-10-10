@@ -29,6 +29,7 @@ import {
   type UpdateTripInput,
 } from '@/features/trips/application/update-trip'
 import type { TripId } from '@/features/trips/domain/ids'
+import { listPassengerOperationalAssignments } from '@/features/trips/application/list-passenger-operational-assignments'
 import { setTripSeatPassenger, type SetTripSeatPassengerInput } from '@/features/trips/application/set-trip-seat-passenger'
 import {
   busLayoutRepository,
@@ -117,6 +118,10 @@ export function listTripsAction() {
     busRepository,
     busLayoutRepository,
   })
+}
+
+export function listPassengerOperationalAssignmentsAction() {
+  return listPassengerOperationalAssignments({ tripRepository, busRepository, busLayoutRepository, tripSeatStateRepository })
 }
 
 export function listTripSeatStatesAction(
