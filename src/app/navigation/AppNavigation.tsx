@@ -52,16 +52,16 @@ export function MobileNavigation() {
     <nav
       aria-label="Navegação principal"
       className="
-        fixed inset-x-0 bottom-0 z-[var(--poltroy-z-sticky)]
-        border-t border-border
-        bg-background/95
-        px-2 pt-2
-        pb-[calc(0.5rem+env(safe-area-inset-bottom))]
-        backdrop-blur-xl
+        fixed left-1/2 -translate-x-1/2
+        bottom-[calc(1rem+env(safe-area-inset-bottom))]
+        z-[var(--poltroy-z-sticky)]
+        w-[calc(100%-2rem)] max-w-[27.5rem]
+        rounded-pill border border-border
+        bg-surface-raised p-2 shadow-raised
         lg:hidden
       "
     >
-      <div className="mx-auto grid max-w-lg grid-cols-4 gap-1">
+      <div className="flex items-center justify-between">
         {navigationItems.map((item) => {
           const Icon = item.icon
 
@@ -70,29 +70,45 @@ export function MobileNavigation() {
               key={item.path}
               to={item.path}
               end={item.end}
+              aria-label={item.label}
               className={({ isActive }) =>
                 cn(
-                  'flex min-h-14 flex-col items-center justify-center',
-                  'gap-1 rounded-control px-2',
-                  'text-[0.6875rem] font-semibold',
-                  'transition-[background-color,color]',
-                  'duration-150 ease-out',
+                  'flex min-h-11 min-w-11 shrink-0 items-center justify-center',
+                  'rounded-pill text-sm font-semibold',
+                  'transition-[background-color,color,padding,gap]',
+                  'duration-[var(--poltroy-duration-slow)] ease-[var(--poltroy-ease-standard)]',
                   'focus-visible:outline-none',
-                  'focus-visible:ring-2 focus-visible:ring-primary/55',
+                  'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-raised',
                   'motion-reduce:transition-none',
                   isActive
-                    ? 'bg-primary/10 text-primary!'
-                    : 'text-muted! hover:bg-surface-soft hover:text-foreground!',
+                    ? 'gap-2 bg-primary px-3 text-on-primary! shadow-control'
+                    : 'gap-0 px-2 text-muted! hover:bg-surface-soft hover:text-foreground!',
                 )
               }
             >
-              <Icon
-                aria-hidden="true"
-                size={21}
-                strokeWidth={1.9}
-              />
+              {({ isActive }) => (
+                <>
+                  <Icon
+                    aria-hidden="true"
+                    className="shrink-0"
+                    size={21}
+                    strokeWidth={1.9}
+                  />
 
-              <span>{item.label}</span>
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'overflow-hidden whitespace-nowrap',
+                      'transition-[max-width,opacity]',
+                      'duration-[var(--poltroy-duration-slow)] ease-[var(--poltroy-ease-standard)]',
+                      'motion-reduce:transition-none',
+                      isActive ? 'max-w-28 opacity-100' : 'max-w-0 opacity-0',
+                    )}
+                  >
+                    {item.label}
+                  </span>
+                </>
+              )}
             </NavLink>
           )
         })}
