@@ -1,0 +1,3 @@
+# Workbox's Rollup API, without a native module blocked by Windows application control.
+overrides:
+  rollup: npm:@rollup/wasm-node@4.64.3

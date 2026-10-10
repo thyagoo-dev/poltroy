@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 
 import { Card } from '@/shared/ui/Card'
+import { PwaInstallCard } from '@/app/pwa/PwaInstallCard'
 
 const futureSections = [
   {
@@ -58,6 +59,8 @@ export function MorePage() {
           nesta área.
         </p>
       </section>
+
+      <PwaInstallCard />
 
       <Card
         className="mt-6"

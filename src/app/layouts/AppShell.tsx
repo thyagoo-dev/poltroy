@@ -16,6 +16,8 @@ import {
   MobileNavigation,
 } from '@/app/navigation/AppNavigation'
 import { navigationItems } from '@/app/navigation/navigation-items'
+import { OfflineStatus } from '@/app/pwa/OfflineStatus'
+import { PwaUpdatePrompt } from '@/app/pwa/PwaUpdatePrompt'
 
 function getCurrentPageTitle(
   pathname: string,
@@ -266,6 +268,8 @@ export function AppShell() {
             lg:pb-[var(--poltroy-space-page-block)]
           "
         >
+          <OfflineStatus />
+          <PwaUpdatePrompt />
           <Outlet />
         </main>
 
