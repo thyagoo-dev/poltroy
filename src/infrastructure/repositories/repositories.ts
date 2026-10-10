@@ -1,4 +1,5 @@
 import { poltroyDatabase } from '@/infrastructure/database/database'
+import { DexieBackupRepository } from '@/infrastructure/repositories/dexie-backup-repository'
 import {
   DexieBusLayoutRepository,
   DexieBusRepository,
@@ -13,6 +14,8 @@ export const busRepository =
   new DexieBusRepository(
     poltroyDatabase,
   )
+
+export const backupRepository = new DexieBackupRepository(poltroyDatabase)
 
 export const busLayoutRepository =
   new DexieBusLayoutRepository(

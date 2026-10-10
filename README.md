@@ -8,7 +8,7 @@ Em desenvolvimento.
 
 Etapa atual:
 
-**Etapa 13 — PWA e funcionamento offline**
+**Etapa 14 — Backup e restauração dos dados locais**
 
 ## Objetivo
 
@@ -70,3 +70,13 @@ O Cache Storage contém apenas os arquivos estáticos do aplicativo. Ônibus, vi
 A instalação fica em **Mais → Aplicativo**, quando oferecida pelo navegador. Novas versões mostram **Agora não / Atualizar**; o aplicativo só aplica a atualização após confirmação.
 
 O gerador de Service Worker do Workbox usa a distribuição oficial WASM do Rollup, via override do pnpm, para funcionar também em ambientes Windows que bloqueiam o módulo nativo. O bundler do Vite 8 permanece inalterado.
+
+## Backup e restauração
+
+Em **Mais → Backup e restauração**, exporte um JSON versionado com ônibus, layouts, viagens, passageiros e estados de assento. A exportação usa um snapshot consistente e funciona offline.
+
+Ao selecionar um arquivo, o POLTROY valida os dados e suas referências antes de mostrar o resumo. Somente após confirmação explícita os cinco conjuntos de dados são substituídos em uma única transação: qualquer falha na escrita desfaz toda a substituição. Não há merge.
+
+Depois do sucesso, os contextos de ônibus e viagem são limpos e o aplicativo recarrega. O ônibus ativo pode ser selecionado novamente pelas regras normais da aplicação. Backup vazio é permitido; Cache Storage, Service Worker e preferências de UI não fazem parte do arquivo.
+
+O backup é JSON sem criptografia e pode conter nomes, telefones, observações e dados operacionais. Guarde-o em local seguro. Nenhum arquivo é enviado a servidores. A leitura aceita até 50 MiB; layouts importados têm limite de 100.000 células ocupadas para evitar expansão excessiva durante a validação.

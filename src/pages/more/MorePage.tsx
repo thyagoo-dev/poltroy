@@ -1,22 +1,17 @@
 import {
-  DatabaseBackup,
   Info,
   Settings,
 } from 'lucide-react'
 
 import { Card } from '@/shared/ui/Card'
 import { PwaInstallCard } from '@/app/pwa/PwaInstallCard'
+import { LocalDataBackupCard } from '@/features/backup/ui/LocalDataBackupCard'
 
 const futureSections = [
   {
     label: 'Configurações',
     description: 'Preferências gerais do Poltroy.',
     icon: Settings,
-  },
-  {
-    label: 'Backup e restauração',
-    description: 'Proteção e recuperação dos dados locais.',
-    icon: DatabaseBackup,
   },
   {
     label: 'Sobre',
@@ -61,6 +56,7 @@ export function MorePage() {
       </section>
 
       <PwaInstallCard />
+      <LocalDataBackupCard />
 
       <Card
         className="mt-6"
