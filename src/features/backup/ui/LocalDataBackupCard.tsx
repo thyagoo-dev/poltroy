@@ -1,5 +1,5 @@
 import { Download, Upload } from 'lucide-react'
-import { useRef, useState, type ChangeEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 
 import { exportBackupAction, restoreBackupAction } from '@/app/services/backup-actions'
 import { backupFilename } from '@/features/backup/application/create-backup'
@@ -28,6 +28,10 @@ export function LocalDataBackupCard() {
   const [issues, setIssues] = useState<readonly BackupIssue[]>([])
   const [restoreError, setRestoreError] = useState<string | null>(null)
   const [feedback, setFeedback] = useState('')
+
+  useEffect(() => {
+    if (preview) previewTitle.current?.focus()
+  }, [preview])
 
   async function handleExport() {
     if (operationInFlight.current) return
@@ -80,7 +84,6 @@ export function LocalDataBackupCard() {
       if (!result.success) setIssues(result.issues)
       else {
         setPreview(result.backup)
-        window.requestAnimationFrame(() => previewTitle.current?.focus())
       }
     } catch {
       setIssues([{ path: 'arquivo', message: 'Não foi possível ler o arquivo selecionado.' }])

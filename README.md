@@ -110,3 +110,7 @@ Passageiros novos exigem nome completo e nome de exibição de até 16 pontos de
 ## Navegação de passageiros — Refino 15.5
 
 A listagem `/passengers` reúne busca e acesso aos cadastros. Criação e edição usam páginas dedicadas (`/passengers/new` e `/passengers/:passengerId/edit`); após salvar, abrem os detalhes em `/passengers/:passengerId`. Identificação aparece somente nos detalhes e na edição. As subrotas também funcionam offline após o cache da aplicação estar disponível.
+
+## Central Mais — Refino 15.6
+
+`/more` reúne os links para Aplicativo (`/more/app`), Backup e restauração (`/more/backup`), Configurações (`/more/settings`) e Sobre (`/more/about`). Instalação PWA e backup têm páginas próprias; Configurações informa que ainda não há preferências configuráveis. As subrotas funcionam offline após o cache da aplicação estar disponível.

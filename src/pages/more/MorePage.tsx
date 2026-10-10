@@ -1,125 +1,37 @@
-import {
-  Info,
-  Settings,
-} from 'lucide-react'
+import { ChevronRight, DatabaseBackup, Info, Settings, Smartphone } from 'lucide-react'
+import { Link } from 'react-router'
 
+import { MorePageHeader } from '@/pages/more/MorePageHeader'
 import { Card } from '@/shared/ui/Card'
-import { PwaInstallCard } from '@/app/pwa/PwaInstallCard'
-import { LocalDataBackupCard } from '@/features/backup/ui/LocalDataBackupCard'
 
-const futureSections = [
-  {
-    label: 'Configurações',
-    description: 'Preferências gerais do Poltroy.',
-    icon: Settings,
-  },
-  {
-    label: 'Sobre',
-    description: 'Informações da aplicação e versão.',
-    icon: Info,
-  },
+const sections = [
+  { path: '/more/app', title: 'Aplicativo', description: 'Instalação e uso offline', icon: Smartphone },
+  { path: '/more/backup', title: 'Backup e restauração', description: 'Proteja seus dados locais', icon: DatabaseBackup },
+  { path: '/more/settings', title: 'Configurações', description: 'Preferências do aplicativo', icon: Settings },
+  { path: '/more/about', title: 'Sobre', description: 'Informações do Poltroy', icon: Info },
 ] as const
 
 export function MorePage() {
   return (
     <div className="mx-auto w-full max-w-4xl">
-      <section
-        aria-labelledby="more-page-title"
-        className="flex flex-col gap-2"
-      >
-        <p
-          className="
-            text-xs font-semibold uppercase
-            tracking-[0.14em]
-            text-subtle
-          "
-        >
-          Sistema
-        </p>
-
-        <h2
-          id="more-page-title"
-          className="
-            text-2xl font-bold
-            tracking-[-0.035em]
-            text-foreground
-            sm:text-3xl
-          "
-        >
-          Mais
-        </h2>
-
-        <p className="max-w-2xl leading-7 text-muted">
-          Configurações e recursos secundários ficarão organizados
-          nesta área.
-        </p>
-      </section>
-
-      <PwaInstallCard />
-      <LocalDataBackupCard />
-
-      <Card
-        className="mt-6"
-        padding="none"
-      >
-        <div className="divide-y divide-border">
-          {futureSections.map((section) => {
-            const Icon = section.icon
-
-            return (
-              <div
-                key={section.label}
-                className="
-                  grid grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-x-4 gap-y-2
-                  sm:grid-cols-[2.5rem_minmax(0,1fr)_auto]
-                  px-5 py-4
-                  sm:px-6
-                "
-              >
-                <div
-                  className="
-                    flex size-10 shrink-0
-                    items-center justify-center
-                    rounded-control
-                    bg-surface-soft
-                    text-muted
-                  "
-                >
-                  <Icon
-                    aria-hidden="true"
-                    size={19}
-                    strokeWidth={1.8}
-                  />
-                </div>
-
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-foreground">
-                    {section.label}
-                  </p>
-
-                  <p className="mt-1 text-xs leading-5 text-muted">
-                    {section.description}
-                  </p>
-                </div>
-
-                <span
-                  className="
-                    col-start-2 w-fit sm:col-start-auto
-                    rounded-pill
-                    border border-border
-                    px-2 py-1
-                    text-[0.625rem] font-semibold
-                    uppercase tracking-[0.08em]
-                    text-subtle
-                  "
-                >
-                  Futuro
+      <MorePageHeader title="Mais" description="Recursos e informações do Poltroy." showBack={false} />
+      <Card className="mt-6" padding="none">
+        <ul aria-label="Recursos do Poltroy" className="divide-y divide-border">
+          {sections.map(({ path, title, description, icon: Icon }, index) => (
+            <li key={path}>
+              <Link to={path} className={`group flex min-h-19 items-center gap-3 px-4 py-4 text-foreground! transition-colors hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary motion-reduce:transition-none sm:gap-4 sm:px-6 ${index === 0 ? 'rounded-t-card' : index === sections.length - 1 ? 'rounded-b-card' : ''}`}>
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-control bg-primary/5 text-primary"><Icon aria-hidden="true" size={20} strokeWidth={1.8} /></span>
+                <span className="min-w-0 flex-1">
+                  <span className="block break-words text-sm font-semibold">{title}</span>
+                  <span className="mt-1 block break-words text-xs leading-5 text-muted">{description}</span>
                 </span>
-              </div>
-            )
-          })}
-        </div>
+                <ChevronRight aria-hidden="true" className="shrink-0 text-subtle group-hover:text-primary" size={18} />
+              </Link>
+            </li>
+          ))}
+        </ul>
       </Card>
+      <p className="mt-4 text-xs leading-5 text-subtle">Seus dados ficam armazenados neste dispositivo.</p>
     </div>
   )
 }

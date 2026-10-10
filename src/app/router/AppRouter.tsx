@@ -8,6 +8,10 @@ import { AppShell } from '@/app/layouts/AppShell'
 import { BusesPage } from '@/pages/buses/BusesPage'
 import { MapPage } from '@/pages/map/MapPage'
 import { MorePage } from '@/pages/more/MorePage'
+import { MoreAppPage } from '@/pages/more/MoreAppPage'
+import { MoreBackupPage } from '@/pages/more/MoreBackupPage'
+import { MoreSettingsPage } from '@/pages/more/MoreSettingsPage'
+import { MoreAboutPage } from '@/pages/more/MoreAboutPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { PassengersPage } from '@/pages/passengers/PassengersPage'
 import { PassengerCreatePage } from '@/pages/passengers/PassengerCreatePage'
@@ -48,6 +52,11 @@ export function AppRouter() {
             path="more"
             element={<MorePage />}
           />
+
+          <Route path="more/app" element={<MoreAppPage />} />
+          <Route path="more/backup" element={<MoreBackupPage />} />
+          <Route path="more/settings" element={<MoreSettingsPage />} />
+          <Route path="more/about" element={<MoreAboutPage />} />
 
           <Route
             path="*"
