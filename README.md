@@ -98,3 +98,7 @@ O POLTROY utiliza Light Mode como tema único: fundo slate-50 (#F8FAFC), superf�
 ## Mapa de assentos — Refino 15.2
 
 O mapa usa uma única superfície de veículo e CSS Grid com corredores estreitos derivados do layout. Poltronas operacionais mostram o passageiro associado ou a situação, com detalhes no sheet existente. O preset convencional de 46 lugares está disponível, mantendo 44 como padrão e os presets de 40/30. A orientação frontal é motorista à esquerda e entrada à direita; layouts legados recebem apenas normalização de apresentação, sem alterar IDs ou dados persistidos.
+
+## Mapa operacional — Refino 15.3
+
+A aba Mapa é um workspace operacional único: sem viagem selecionada, apresenta o acesso a Viagens; viagens planejadas ou em andamento abrem o mapa de passageiros e estados. O resumo é compacto, a busca permanece visível e os seis filtros ficam em um dialog próprio. Selecionar ônibus na Frota mantém o usuário nessa página. Os componentes de mapa físico permanecem disponíveis, sem fallback automático na aba Mapa.

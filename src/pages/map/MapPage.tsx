@@ -1,17 +1,14 @@
 import {
-  BusFront,
-  Plus,
+  Route,
   TriangleAlert,
 } from 'lucide-react'
 import { Link } from 'react-router'
 import { useRef, useState } from 'react'
 
-import { useActiveBusLayout } from '@/app/hooks/use-active-bus-layout'
 import { useOperationalTripMap } from '@/app/hooks/use-operational-trip-map'
 import { completeTripAction, startTripAction, setTripSeatPassengerAction, setTripSeatStatusAction } from '@/app/services/trip-actions'
 import type { PassengerId } from '@/features/passengers/domain/ids'
 import type { SeatId } from '@/features/seat-map/domain/ids'
-import { BusMap } from '@/features/seat-map/ui/BusMap'
 import type { SeatStatus } from '@/features/trips/domain/trip-seat-state'
 import { OperationalBusMap } from '@/features/trips/ui/OperationalBusMap'
 import { OperationalTripPanel } from '@/features/trips/ui/OperationalTripPanel'
@@ -27,9 +24,6 @@ export function MapPage() {
   const [completeTarget, setCompleteTarget] = useState<Trip | null>(null)
   const tripActionInFlight = useRef(false)
   const selectBus = useBusSelectionStore((state) => state.selectBus)
-  const physicalMap =
-    useActiveBusLayout()
-
   const operationalMap =
     useOperationalTripMap()
 
@@ -58,12 +52,7 @@ export function MapPage() {
     operationalMap.refresh()
   }
 
-  const pageDescription =
-    operationalMap.trip
-      ? 'Prepare os assentos e acompanhe a operação da viagem.'
-      : physicalMap.activeBus
-        ? `Visualização estrutural de ${physicalMap.activeBus.name}.`
-        : 'Selecione um ônibus para visualizar sua configuração.'
+  const pageDescription = 'Visualize passageiros, estados e ocupação desta viagem.'
 
   async function handleSeatPassengerChange(seatId: SeatId, passengerId: PassengerId | null) {
     if (!operationalMap.trip) return
@@ -109,7 +98,7 @@ export function MapPage() {
     <div className="mx-auto w-full max-w-6xl">
       <section
         aria-labelledby="map-page-title"
-        className="flex flex-col gap-2"
+        className="flex flex-col gap-1"
       >
         <p
           className="
@@ -133,9 +122,9 @@ export function MapPage() {
           Mapa de assentos
         </h2>
 
-        <p className="max-w-2xl leading-7 text-muted [overflow-wrap:anywhere]">
+        {hasOperationalTrip && <p className="max-w-2xl text-sm leading-6 text-muted [overflow-wrap:anywhere]">
           {pageDescription}
-        </p>
+        </p>}
       </section>
 
       {hasOperationalTrip ? (
@@ -199,7 +188,7 @@ export function MapPage() {
                     .clearOperationalTrip
                 }
               >
-                Voltar ao mapa físico
+                Fechar viagem
               </Button>
             </div>
           </Card>
@@ -215,7 +204,7 @@ export function MapPage() {
                 operationalMap.clearOperationalTrip()
               }} />
 
-            <div className="mt-6 min-w-0">
+            <div className="mt-4 min-w-0">
               <OperationalBusMap
                 passengers={operationalMap.passengers}
                 onChangePassenger={handleSeatPassengerChange}
@@ -237,123 +226,19 @@ export function MapPage() {
             </div>
           </>
         )
-      ) : physicalMap.isLoading ? (
-        <Card
-          className="
-            mt-6
-            flex min-h-80
-            items-center justify-center
-          "
-          padding="lg"
-        >
-          <p className="text-sm text-muted">
-            Carregando mapa...
-          </p>
-        </Card>
-      ) : !physicalMap.activeBus ? (
-        <Card
-          className="
-            mt-6
-            flex min-h-80
-            items-center justify-center
-            sm:min-h-96
-          "
-          padding="lg"
-        >
+      ) : (
+        <Card className="mt-6 flex min-h-72 items-center justify-center" padding="lg">
           <div className="max-w-md text-center">
-            <div
-              className="
-                mx-auto
-                flex size-14
-                items-center justify-center
-                rounded-card
-                border border-primary/15
-                bg-primary/10
-                text-primary
-              "
-            >
-              <BusFront
-                aria-hidden="true"
-                size={27}
-              />
-            </div>
-
-            <h3 className="mt-5 text-lg font-semibold text-foreground">
-              Nenhum ônibus selecionado
-            </h3>
-
+            <Route aria-hidden="true" size={27} className="mx-auto text-primary" />
+            <h3 className="mt-4 text-lg font-semibold">Nenhuma viagem aberta no mapa</h3>
             <p className="mt-2 text-sm leading-6 text-muted">
-              Adicione ou selecione um ônibus para visualizar o mapa físico.
+              Abra uma viagem planejada ou em andamento para visualizar assentos, passageiros e estados da operação.
             </p>
-
-            <Link
-              to="/buses"
-              className="
-                mx-auto mt-5
-                inline-flex min-h-11
-                items-center justify-center
-                gap-2
-                rounded-control
-                bg-primary
-                px-4
-                text-sm font-semibold
-                text-on-primary!
-                shadow-control
-                transition-colors
-                hover:bg-primary-hover
-                focus-visible:outline-none
-                focus-visible:ring-2
-                focus-visible:ring-primary
-              "
-            >
-              <Plus
-                aria-hidden="true"
-                size={17}
-              />
-
-              Gerenciar ônibus
+            <Link to="/trips" className="mx-auto mt-5 inline-flex min-h-11 items-center justify-center rounded-control bg-primary px-4 text-sm font-semibold text-on-primary! shadow-control hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface">
+              Ver viagens
             </Link>
           </div>
         </Card>
-      ) : physicalMap.error ||
-        !physicalMap.activeLayout ? (
-        <Card
-          className="mt-6"
-          padding="lg"
-        >
-          <p className="text-sm text-danger">
-            {physicalMap.error ??
-              'Layout indisponível.'}
-          </p>
-        </Card>
-      ) : (
-        <>
-          <div className="mt-6 min-w-0">
-            <BusMap
-              key={physicalMap.activeLayout.id}
-              layout={
-                physicalMap
-                  .activeLayout
-              }
-            />
-          </div>
-
-          <Card
-            className="mt-4"
-            padding="md"
-          >
-            <p className="text-sm leading-6 text-muted">
-              Este é o mapa físico do ônibus. Para alterar estados dos assentos, abra uma viagem planejada ou em andamento em{' '}
-              <Link
-                to="/trips"
-                className="font-semibold text-primary! hover:underline"
-              >
-                Viagens
-              </Link>
-              .
-            </p>
-          </Card>
-        </>
       )}
       <ConfirmDialog open={completeTarget !== null} title="Concluir viagem?"
         description={completeTarget ? `${completeTarget.origin} → ${completeTarget.destination} será movida para o histórico e o mapa deixará de ser editável.` : ''}

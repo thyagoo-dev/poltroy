@@ -12,7 +12,6 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { useNavigate } from 'react-router'
 
 import {
   archiveBusAction,
@@ -45,7 +44,6 @@ type FormState =
   | null
 
 export function BusesPage() {
-  const navigate = useNavigate()
   const clearOperationalTrip = useTripOperationStore((state) => state.clearOperationalTrip)
 
   const activeBusId =
@@ -347,7 +345,8 @@ export function BusesPage() {
     clearOperationalTrip()
     selectBus(bus.id)
 
-    navigate('/')
+    setError(null)
+    setMessage('Ônibus selecionado.')
   }
 
   return (

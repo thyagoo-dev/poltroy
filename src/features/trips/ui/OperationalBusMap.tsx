@@ -19,8 +19,6 @@ import { summarizeOperationalSeats } from '@/features/trips/domain/operational-s
 import { OperationalMapControls } from '@/features/trips/ui/OperationalMapControls'
 import { OperationalSeatButton } from '@/features/trips/ui/OperationalSeatButton'
 import { SeatStatusSheet } from '@/features/trips/ui/SeatStatusSheet'
-import { seatStatusVisuals } from '@/features/trips/ui/seat-status-visuals'
-import { cn } from '@/shared/lib/cn'
 
 interface OperationalBusMapProps {
   trip: Trip
@@ -125,13 +123,6 @@ export function OperationalBusMap({
     })
   }).map((seat) => seat.id)), [seatElements, stateBySeatId, passengerById, filter, search])
 
-  const counters: readonly [SeatStatus, number][] = [
-    ['FREE', summary.free],
-    ['OCCUPIED', summary.occupied],
-    ['RESERVED', summary.reserved],
-    ['BLOCKED', summary.blocked],
-  ]
-
   async function handleStatusSelect(
     status: SeatStatus,
   ) {
@@ -186,66 +177,13 @@ export function OperationalBusMap({
 
   return (
     <>
-      <div
-        className="
-          mb-6
-          grid grid-cols-2
-          gap-2
-          sm:grid-cols-4
-        "
-        aria-label="Resumo dos assentos"
-      >
-        {counters.map(
-          ([
-            status,
-            count,
-          ]) => {
-            const visual =
-              seatStatusVisuals[
-                status
-              ]
-
-            const Icon =
-              visual.icon
-
-            return (
-              <div
-                key={status}
-                className={cn(
-                  'rounded-control',
-                  'border',
-                  'px-3 py-3',
-                  visual.className,
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  <Icon
-                    aria-hidden="true"
-                    size={14}
-                  />
-
-                  <span className="text-xs font-semibold">
-                    {
-                      visual.label
-                    }
-                  </span>
-                </div>
-
-                <p className="mt-2 text-xl font-bold tracking-[-0.03em]">
-                  {count}
-                </p>
-              </div>
-            )
-          },
-        )}
-      </div>
-
-      <p className="mb-5 text-sm text-muted">
-        Com passageiro: <strong className="text-foreground">{summary.withPassenger}</strong>
-        {' · '}Sem passageiro: <strong className="text-foreground">{summary.withoutPassenger}</strong>
-        <span className="mt-1 block text-xs text-subtle">Entre os assentos ocupados ou reservados.</span>
+      <p aria-label="Resumo dos assentos" className="mb-3 flex flex-wrap gap-x-2 gap-y-1 text-sm text-muted">
+        <strong className="text-foreground">{summary.totalSeats} assentos</strong>
+        <span>· {summary.free} livres</span>
+        {summary.occupied > 0 && <span>· {summary.occupied} {summary.occupied === 1 ? 'ocupado' : 'ocupados'}</span>}
+        {summary.reserved > 0 && <span>· {summary.reserved} {summary.reserved === 1 ? 'reservado' : 'reservados'}</span>}
+        {summary.blocked > 0 && <span>· {summary.blocked} {summary.blocked === 1 ? 'bloqueado' : 'bloqueados'}</span>}
       </p>
-
       <OperationalMapControls filter={filter} search={search} matchCount={matchingSeatIds.size}
         onFilterChange={setFilter} onSearchChange={setSearch} onClear={() => {
           setFilter('ALL')
