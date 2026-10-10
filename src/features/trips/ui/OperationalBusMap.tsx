@@ -14,15 +14,12 @@ import {
   type SeatStatus,
   type TripSeatState,
 } from '@/features/trips/domain/trip-seat-state'
-import type { Trip } from '@/features/trips/domain/trip'
 import { matchesOperationalSeatFilter, type OperationalSeatFilter } from '@/features/trips/domain/operational-seat-filter'
-import { summarizeOperationalSeats } from '@/features/trips/domain/operational-seat-summary'
 import { OperationalMapControls } from '@/features/trips/ui/OperationalMapControls'
 import { OperationalSeatButton } from '@/features/trips/ui/OperationalSeatButton'
 import { SeatStatusSheet } from '@/features/trips/ui/SeatStatusSheet'
 
 interface OperationalBusMapProps {
-  trip: Trip
   layout: BusLayout
 
   states:
@@ -37,7 +34,6 @@ interface OperationalBusMapProps {
 }
 
 export function OperationalBusMap({
-  trip,
   layout,
   states,
   passengers,
@@ -111,7 +107,6 @@ export function OperationalBusMap({
       selectedState,
     )
 
-  const summary = useMemo(() => summarizeOperationalSeats(layout, states), [layout, states])
   const passengerById = useMemo(() => new Map(passengers.map((passenger) => [passenger.id, passenger])), [passengers])
   const matchingSeatIds = useMemo(() => new Set(seatElements.filter((seat) => {
     const state = stateBySeatId.get(seat.id)
@@ -178,13 +173,6 @@ export function OperationalBusMap({
 
   return (
     <>
-      <p aria-label="Resumo dos assentos" className="mb-3 flex flex-wrap gap-x-2 gap-y-1 text-sm text-muted">
-        <strong className="text-foreground">{summary.totalSeats} assentos</strong>
-        <span>· {summary.free} livres</span>
-        {summary.occupied > 0 && <span>· {summary.occupied} {summary.occupied === 1 ? 'ocupado' : 'ocupados'}</span>}
-        {summary.reserved > 0 && <span>· {summary.reserved} {summary.reserved === 1 ? 'reservado' : 'reservados'}</span>}
-        {summary.blocked > 0 && <span>· {summary.blocked} {summary.blocked === 1 ? 'bloqueado' : 'bloqueados'}</span>}
-      </p>
       <OperationalMapControls filter={filter} search={search} matchCount={matchingSeatIds.size}
         onFilterChange={setFilter} onSearchChange={setSearch} onClear={() => {
           setFilter('ALL')
@@ -193,6 +181,7 @@ export function OperationalBusMap({
 
       <BusMap
         layout={layout}
+        showLayoutSummary={false}
         renderElement={(
           placement,
         ) => {
@@ -274,15 +263,6 @@ export function OperationalBusMap({
         }
       />
 
-      <p className="mt-4 text-xs leading-5 text-subtle">
-        Estados referentes à viagem{' '}
-        <span className="font-semibold text-muted">
-          {trip.origin}
-          {' → '}
-          {trip.destination}
-        </span>
-        .
-      </p>
     </>
   )
 }

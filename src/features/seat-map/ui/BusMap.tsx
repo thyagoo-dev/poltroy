@@ -22,6 +22,7 @@ import { cn } from '@/shared/lib/cn'
 
 interface BusMapProps {
   layout: BusLayout
+  showLayoutSummary?: boolean
 
   renderElement?: (
     placement:
@@ -42,6 +43,7 @@ const structuralElementOrder:
 
 export function BusMap({
   layout,
+  showLayoutSummary = true,
   renderElement,
 }: BusMapProps) {
   const [
@@ -189,7 +191,7 @@ export function BusMap({
       aria-label={`Mapa do layout ${layout.name}`}
       className="min-w-0"
     >
-      <div
+      {(showLayoutSummary || model.decks.length > 1) && <div
         className="
           flex flex-col gap-4
           sm:flex-row
@@ -197,7 +199,7 @@ export function BusMap({
           sm:justify-between
         "
       >
-        <div>
+        {showLayoutSummary && <div>
           <h3 className="font-semibold text-foreground">
             {layout.name}
           </h3>
@@ -206,7 +208,7 @@ export function BusMap({
             {activeDeck.seatCount}{' '}
             assentos
           </p>
-        </div>
+        </div>}
 
         {model.decks.length >
           1 && (
@@ -260,11 +262,11 @@ export function BusMap({
             )}
           </div>
         )}
-      </div>
+      </div>}
 
       <div
-        className="
-          mt-4 min-w-0
+        className={cn((showLayoutSummary || model.decks.length > 1) && 'mt-4', `
+          min-w-0
           overflow-x-auto [container-type:inline-size]
           pb-2
           [--seat-map-aisle-width:1.125rem]
@@ -273,7 +275,7 @@ export function BusMap({
           sm:[--seat-map-aisle-width:1.5rem]
           sm:[--seat-map-gap:0.5rem]
           sm:[--seat-map-row-height:4.5rem]
-        "
+        `)}
       >
         <div
           className="

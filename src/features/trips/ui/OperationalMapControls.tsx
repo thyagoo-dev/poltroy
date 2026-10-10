@@ -23,23 +23,21 @@ export function OperationalMapControls({ filter, search, matchCount, onFilterCha
   const filterLabel = operationalFilterOptions.find(([value]) => value === filter)![1]
   return (
     <section aria-label="Busca e filtros do mapa" className="mb-4 space-y-2">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:gap-4">
+      <div className="flex items-center gap-2">
         <div className="min-w-0 flex-1">
-          <label htmlFor={`${id}-search`} className="text-sm font-semibold">Buscar assento ou passageiro</label>
-          <Input id={`${id}-search`} type="search" className="mt-1" placeholder="Número do assento, nome ou telefone"
+          <label htmlFor={`${id}-search`} className="sr-only">Buscar assento ou passageiro</label>
+          <Input id={`${id}-search`} type="search" className="px-3" placeholder="Buscar assento ou passageiro"
             value={search} onChange={(event) => onSearchChange(event.target.value)} />
         </div>
-        <div className="flex items-center justify-between gap-3 sm:justify-end">
-          <p className="min-w-0 text-sm text-muted">Status: <strong className="text-foreground">{filterLabel}</strong></p>
-          <Button variant="secondary" size="sm" className="shrink-0" aria-haspopup="dialog"
-            aria-expanded={filterOpen} onClick={() => setFilterOpen(true)}>
-            <SlidersHorizontal aria-hidden="true" size={16} />Filtros
-          </Button>
-        </div>
+        <Button variant="secondary" size="sm" className="shrink-0 px-3" aria-haspopup="dialog"
+          aria-expanded={filterOpen} onClick={() => setFilterOpen(true)}>
+          <SlidersHorizontal aria-hidden="true" size={16} />Filtros
+        </Button>
       </div>
       {hasCriteria && (
         <div className="flex flex-wrap items-center justify-between gap-x-2">
-          <p role="status" aria-atomic="true" className="text-xs text-muted">
+          <p role="status" aria-atomic="true" className="min-w-0 text-xs text-muted">
+            {filter !== 'ALL' && <span className="font-semibold text-foreground">{filterLabel} · </span>}
             {matchCount} {matchCount === 1 ? 'assento encontrado' : 'assentos encontrados'}
           </p>
           <Button variant="ghost" size="sm" onClick={onClear}>Limpar filtros</Button>

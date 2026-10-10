@@ -15,6 +15,7 @@ interface ConfirmDialogProps {
 
   confirmLabel?: string
   cancelLabel?: string
+  pendingLabel?: string
 
   isPending?: boolean
   error?: string | null
@@ -29,6 +30,7 @@ export function ConfirmDialog({
   description,
   confirmLabel = 'Confirmar',
   cancelLabel = 'Cancelar',
+  pendingLabel = 'Aguarde...',
   isPending = false,
   error,
   onConfirm,
@@ -135,7 +137,7 @@ export function ConfirmDialog({
             disabled={isPending}
           >
             {isPending
-              ? 'Aguarde...'
+              ? pendingLabel
               : confirmLabel}
           </Button>
         </div>
