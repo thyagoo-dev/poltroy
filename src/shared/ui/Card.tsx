@@ -38,7 +38,7 @@ export function Card({
   return (
     <div
       className={cn(
-        'rounded-card',
+        'min-w-0 rounded-card [overflow-wrap:anywhere]',
         variantClasses[variant],
         paddingClasses[padding],
         className,

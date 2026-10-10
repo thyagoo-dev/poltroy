@@ -26,7 +26,7 @@ export function OperationalTripPanel({ trip, bus, layout, pendingAction, error, 
             {trip.status === 'ACTIVE' ? 'Em andamento' : 'Planejada'}
           </span>
         </div>
-        <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
+        <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2 xl:grid-cols-4">
           <div className="min-w-0"><dt className="text-xs text-subtle">Ônibus</dt><dd className="mt-1 break-words text-muted">{bus.name}</dd></div>
           <div className="min-w-0"><dt className="text-xs text-subtle">Layout</dt><dd className="mt-1 break-words text-muted">{layout.name}</dd></div>
           <div><dt className="text-xs text-subtle">Saída</dt><dd className="mt-1 text-muted"><time dateTime={trip.departureAt}>{formatDateTime(trip.departureAt)}</time></dd></div>

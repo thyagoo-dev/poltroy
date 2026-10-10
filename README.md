@@ -8,7 +8,7 @@ Em desenvolvimento.
 
 Etapa atual:
 
-**Etapa 14 — Backup e restauração dos dados locais**
+**Etapa 15 — Responsividade e adaptação avançada**
 
 ## Objetivo
 
@@ -80,3 +80,13 @@ Ao selecionar um arquivo, o POLTROY valida os dados e suas referências antes de
 Depois do sucesso, os contextos de ônibus e viagem são limpos e o aplicativo recarrega. O ônibus ativo pode ser selecionado novamente pelas regras normais da aplicação. Backup vazio é permitido; Cache Storage, Service Worker e preferências de UI não fazem parte do arquivo.
 
 O backup é JSON sem criptografia e pode conter nomes, telefones, observações e dados operacionais. Guarde-o em local seguro. Nenhum arquivo é enviado a servidores. A leitura aceita até 50 MiB; layouts importados têm limite de 100.000 células ocupadas para evitar expansão excessiva durante a validação.
+
+## Responsividade
+
+O layout permanece mobile-first e usa os breakpoints existentes: xs (480 px), sm (640 px), md (768 px), lg (1024 px), xl (1280 px) e 2xl (1536 px). As listas de ônibus, viagens e passageiros passam a duas colunas em md; a sidebar substitui a navegação floating em lg. A área de conteúdo tem largura máxima e Mais usa uma coluna de leitura mais compacta.
+
+Os mapas preservam CSS Grid e células entre 44 e 56 px. Os presets de 44, 40 e 30 lugares cabem em 320 px; layouts mais largos usam scroll horizontal apenas no mapa. Cards quebram conteúdo sem espaços, sem esconder overflow do documento.
+
+Header, navegação, sidebar e dialogs respeitam safe areas. Dialogs e a prévia de backup têm scroll próprio limitado pela altura dinâmica (dvh). A adaptação usa CSS/Tailwind, sem estado JavaScript de viewport ou detecção de dispositivo. A ordem visual das ações acompanha a ordem do teclado.
+
+Os tokens de altura do header e de espaço reservado à navegação também definem o scroll-padding do documento. O scroll nativo de foco considera essas áreas, inclusive com viewport reduzido; campos maiores, como textareas, continuam acessíveis pelo scroll natural, sem detectar o teclado em JavaScript.

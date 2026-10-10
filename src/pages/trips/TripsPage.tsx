@@ -415,7 +415,7 @@ export function TripsPage() {
       readonly TripSummary[],
   ) {
     return (
-      <div className="mt-4 grid gap-4 xl:grid-cols-2">
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
         {summaries.map(
           (summary) => (
             <TripCard

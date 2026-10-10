@@ -28,6 +28,19 @@ html {
   background: var(--poltroy-color-background);
 }
 
+html {
+  scroll-padding-block-start: calc(var(--poltroy-shell-header-height) + env(safe-area-inset-top));
+  scroll-padding-block-end: calc(var(--poltroy-mobile-nav-clearance) + env(safe-area-inset-bottom));
+
+  @variant lg {
+    scroll-padding-block-end: var(--poltroy-space-page-block);
+  }
+}
+
+dialog {
+  scroll-padding-block: var(--poltroy-space-card) calc(var(--poltroy-space-card) + env(safe-area-inset-bottom));
+}
+
 body {
   margin: 0;
 
@@ -54,6 +67,7 @@ input,
 textarea,
 select {
   font: inherit;
+  scroll-margin-block: var(--poltroy-space-card);
 }
 
 button:not(:disabled) {

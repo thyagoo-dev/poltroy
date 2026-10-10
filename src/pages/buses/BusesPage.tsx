@@ -552,7 +552,7 @@ export function BusesPage() {
             </div>
           </Card>
         ) : (
-          <div className="mt-4 grid gap-4 xl:grid-cols-2">
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
             {activeBuses.map(
               ({
                 bus,
@@ -592,7 +592,7 @@ export function BusesPage() {
 
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h4 className="break-words font-semibold text-foreground">
+                          <h4 className="min-w-0 break-words font-semibold text-foreground">
                             {bus.name}
                           </h4>
 
@@ -733,7 +733,7 @@ export function BusesPage() {
             </span>
           </div>
 
-          <div className="mt-4 grid gap-3 xl:grid-cols-2">
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
             {archivedBuses.map(
               ({
                 bus,
@@ -752,7 +752,7 @@ export function BusesPage() {
                     />
 
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-muted">
+                      <p className="text-sm font-semibold text-muted">
                         {bus.name}
                       </p>
 

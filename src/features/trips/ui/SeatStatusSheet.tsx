@@ -104,7 +104,9 @@ export function SeatStatusSheet({
       }}
       className="
         m-0 mt-auto
-        w-full max-w-none max-h-dvh overflow-y-auto
+        top-[env(safe-area-inset-top)]
+        w-full max-w-none max-h-[calc(100dvh-env(safe-area-inset-top))] overflow-y-auto
+        [overflow-wrap:anywhere]
         rounded-t-sheet
         border border-border
         bg-surface
@@ -118,7 +120,7 @@ export function SeatStatusSheet({
         sm:rounded-card
       "
     >
-      <div className="p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:p-6">
+      <div className="p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:p-6 sm:pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
         <p id={seatLabelId} className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
           Assento {seatNumber}
         </p>

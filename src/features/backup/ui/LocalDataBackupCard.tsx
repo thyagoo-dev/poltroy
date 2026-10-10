@@ -134,7 +134,7 @@ export function LocalDataBackupCard() {
           {issues.length > 5 && <p className="mt-2">Há outros erros no arquivo. Revise o backup antes de tentar novamente.</p>}
         </div>}
 
-        {preview && <section aria-labelledby="backup-preview-title" className="mt-4 rounded-control border border-border bg-surface-soft p-4">
+        {preview && <section aria-labelledby="backup-preview-title" className="mt-4 max-h-[calc(100dvh-var(--poltroy-shell-header-height)-var(--poltroy-mobile-nav-clearance)-env(safe-area-inset-top)-env(safe-area-inset-bottom))] overflow-y-auto rounded-control border border-border bg-surface-soft p-4 lg:max-h-[calc(100dvh-var(--poltroy-shell-header-height)-env(safe-area-inset-top)-env(safe-area-inset-bottom))]">
           <h4 ref={previewTitle} tabIndex={-1} id="backup-preview-title" className="font-semibold focus-visible:outline-2 focus-visible:outline-primary">Backup válido</h4>
           <p className="mt-2 text-sm text-muted">Exportado em: <time dateTime={preview.exportedAt}>{new Date(preview.exportedAt).toLocaleString('pt-BR')}</time></p>
           <dl className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">

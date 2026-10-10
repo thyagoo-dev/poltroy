@@ -133,7 +133,7 @@ export function MapPage() {
           Mapa de assentos
         </h2>
 
-        <p className="max-w-2xl leading-7 text-muted">
+        <p className="max-w-2xl leading-7 text-muted [overflow-wrap:anywhere]">
           {pageDescription}
         </p>
       </section>
@@ -216,9 +216,9 @@ export function MapPage() {
               }} />
 
             <Card
-              className="mt-4"
+              className="mt-4 p-3 sm:p-7"
               variant="raised"
-              padding="lg"
+              padding="none"
             >
               <OperationalBusMap
                 passengers={operationalMap.passengers}
@@ -333,9 +333,9 @@ export function MapPage() {
       ) : (
         <>
           <Card
-            className="mt-6"
+            className="mt-6 p-3 sm:p-7"
             variant="raised"
-            padding="lg"
+            padding="none"
           >
             <BusMap
               key={physicalMap.activeLayout.id}

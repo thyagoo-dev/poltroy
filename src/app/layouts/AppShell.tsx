@@ -98,10 +98,11 @@ export function AppShell() {
           border-r border-border
           bg-surface/55
           lg:sticky lg:top-0 lg:flex lg:h-dvh
-          lg:flex-col
+          lg:flex-col lg:overflow-y-auto
+          pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]
         "
       >
-        <div className="flex min-h-20 items-center gap-3 px-5">
+        <div className="flex min-h-20 shrink-0 items-center gap-3 px-5">
           <div
             className="
               flex size-10 shrink-0 items-center justify-center
@@ -173,14 +174,14 @@ export function AppShell() {
         >
           <div
             className="
-              mx-auto flex min-h-16
+              mx-auto flex min-h-[var(--poltroy-shell-header-height)]
               w-full max-w-[100rem]
               items-center justify-between
               gap-3
               px-[var(--poltroy-space-page-inline)]
             "
           >
-            <div className="min-w-0">
+            <div className="min-w-0 shrink-0">
               <p
                 className="
                   text-[0.6875rem] font-bold
@@ -208,7 +209,7 @@ export function AppShell() {
             <Link
               to="/buses"
               className="
-                flex min-w-0
+                flex min-h-11 min-w-0 flex-1
                 max-w-[13rem]
                 items-center gap-2.5
                 rounded-pill
@@ -225,6 +226,7 @@ export function AppShell() {
                 sm:max-w-[18rem]
               "
               aria-label={`Gerenciar ônibus. Selecionado: ${activeBusLabel}`}
+              title={activeBusLabel}
             >
               <BusFront
                 aria-hidden="true"
@@ -260,11 +262,11 @@ export function AppShell() {
         <main
           className="
             mx-auto
-            min-h-[calc(100dvh-4rem)]
+            min-h-[calc(100dvh-var(--poltroy-shell-header-height))]
             w-full max-w-[100rem]
             px-[var(--poltroy-space-page-inline)]
             py-[var(--poltroy-space-page-block)]
-            pb-[calc(6.5rem+env(safe-area-inset-bottom))]
+            pb-[calc(var(--poltroy-mobile-nav-clearance)+env(safe-area-inset-bottom))]
             lg:pb-[var(--poltroy-space-page-block)]
           "
         >

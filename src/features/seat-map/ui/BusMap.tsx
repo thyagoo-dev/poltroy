@@ -173,6 +173,7 @@ export function BusMap({
   return (
     <section
       aria-label={`Mapa do layout ${layout.name}`}
+      className="min-w-0"
     >
       <div
         className="
@@ -205,7 +206,7 @@ export function BusMap({
             role="group"
             aria-label="Andar do ônibus"
             className="
-              flex w-fit
+              flex w-fit max-w-full flex-wrap
               rounded-control
               border border-border
               bg-surface
@@ -231,7 +232,7 @@ export function BusMap({
                       )
                     }
                     className={cn(
-                      'min-h-9',
+                      'min-h-11',
                       'rounded-[0.7rem]',
                       'px-3',
                       'text-xs font-semibold',
@@ -267,9 +268,9 @@ export function BusMap({
             rounded-[2.25rem]
             border border-border
             bg-surface
-            px-3 pb-5 pt-4
+            px-1 pb-5 pt-4
             shadow-raised
-            sm:px-5 sm:pb-6
+            xs:px-3 sm:px-5 sm:pb-6
           "
         >
           <div

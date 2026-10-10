@@ -11,7 +11,7 @@ export function Select({
   return (
     <select
       className={cn(
-        'min-h-11 w-full',
+        'min-h-11 min-w-0 w-full max-w-full truncate',
         'rounded-control',
         'border border-border',
         'bg-surface-raised',

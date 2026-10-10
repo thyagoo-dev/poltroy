@@ -54,7 +54,7 @@ export function PassengerForm({ passenger, isSubmitting, onSubmit, onCancel }: P
           value={notes} onChange={(event) => setNotes(event.target.value)} />
       </div>
       {error && <p id={`${id}-error`} role="alert" className="rounded-control border border-danger/20 bg-danger/10 px-3 py-2.5 text-sm text-danger">{error}</p>}
-      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
         <Button variant="ghost" disabled={isSubmitting} onClick={onCancel}>Cancelar</Button>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Salvando...' : passenger ? 'Salvar alterações' : 'Criar passageiro'}

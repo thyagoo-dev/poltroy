@@ -45,6 +45,10 @@
   --poltroy-space-section: 1.5rem;
   --poltroy-space-card: 1.25rem;
 
+  /* Shared clearance for sticky header, floating navigation and focus scroll. */
+  --poltroy-shell-header-height: 4rem;
+  --poltroy-mobile-nav-clearance: 6.5rem;
+
   /*
    * Radius
    */

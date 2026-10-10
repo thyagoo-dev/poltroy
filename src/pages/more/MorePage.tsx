@@ -22,7 +22,7 @@ const futureSections = [
 
 export function MorePage() {
   return (
-    <div className="mx-auto w-full max-w-6xl">
+    <div className="mx-auto w-full max-w-4xl">
       <section
         aria-labelledby="more-page-title"
         className="flex flex-col gap-2"
@@ -70,7 +70,8 @@ export function MorePage() {
               <div
                 key={section.label}
                 className="
-                  flex items-center gap-4
+                  grid grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-x-4 gap-y-2
+                  sm:grid-cols-[2.5rem_minmax(0,1fr)_auto]
                   px-5 py-4
                   sm:px-6
                 "
@@ -103,7 +104,7 @@ export function MorePage() {
 
                 <span
                   className="
-                    ml-auto shrink-0
+                    col-start-2 w-fit sm:col-start-auto
                     rounded-pill
                     border border-border
                     px-2 py-1

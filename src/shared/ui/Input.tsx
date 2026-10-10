@@ -11,7 +11,7 @@ export function Input({
   return (
     <input
       className={cn(
-        'min-h-11 w-full',
+        'min-h-11 min-w-0 w-full max-w-full',
         'rounded-control',
         'border border-border',
         'bg-surface-raised',
