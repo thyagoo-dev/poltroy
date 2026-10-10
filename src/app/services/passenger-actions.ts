@@ -1,5 +1,6 @@
 import { createPassenger } from '@/features/passengers/application/create-passenger'
 import { listPassengers } from '@/features/passengers/application/list-passengers'
+import type { PassengerId } from '@/features/passengers/domain/ids'
 import type { PassengerInputFields } from '@/features/passengers/application/passenger-input'
 import { updatePassenger, type UpdatePassengerInput } from '@/features/passengers/application/update-passenger'
 import { passengerRepository } from '@/infrastructure/repositories/repositories'
@@ -14,4 +15,8 @@ export function updatePassengerAction(input: UpdatePassengerInput) {
 
 export function listPassengersAction() {
   return listPassengers(passengerRepository)
+}
+
+export function getPassengerAction(id: PassengerId) {
+  return passengerRepository.getById(id)
 }

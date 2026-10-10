@@ -1,13 +1,11 @@
 import { Plus, UsersRound } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router'
 
-import { createPassengerAction, listPassengersAction, updatePassengerAction } from '@/app/services/passenger-actions'
-import type { PassengerInputFields } from '@/features/passengers/application/passenger-input'
+import { listPassengersAction } from '@/app/services/passenger-actions'
 import type { Passenger } from '@/features/passengers/domain/passenger'
 import { resolvePassengerDisplayName } from '@/features/passengers/domain/passenger-display-name'
 import { matchesPassengerSearch } from '@/features/passengers/domain/passenger-search'
-import { PassengerForm } from '@/features/passengers/ui/PassengerForm'
-import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { Input } from '@/shared/ui/Input'
 
@@ -15,12 +13,8 @@ export function PassengersPage() {
   const [passengers, setPassengers] = useState<readonly Passenger[]>([])
   const [query, setQuery] = useState('')
   const [isLoading, setIsLoading] = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [formState, setFormState] = useState<{ passenger?: Passenger } | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [message, setMessage] = useState<string | null>(null)
-  const formHeadingRef = useRef<HTMLHeadingElement>(null)
-  const triggerRef = useRef<HTMLElement | null>(null)
+  const headingRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -35,29 +29,9 @@ export function PassengersPage() {
   }, [])
 
   useEffect(() => {
-    if (formState) formHeadingRef.current?.scrollIntoView({ block: 'nearest' })
-  }, [formState])
-
-  function closeForm() {
-    setFormState(null)
-    requestAnimationFrame(() => triggerRef.current?.focus())
-  }
-
-  async function handleSubmit(values: PassengerInputFields) {
-    setIsSubmitting(true)
-    setMessage(null)
-    try {
-      const saved = formState?.passenger
-        ? await updatePassengerAction({ id: formState.passenger.id, ...values })
-        : await createPassengerAction(values)
-      setPassengers((current) => [...current.filter((passenger) => passenger.id !== saved.id), saved]
-        .sort((a, b) => a.name.localeCompare(b.name)))
-      setMessage('Passageiro salvo com sucesso.')
-      closeForm()
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+    window.scrollTo(0, 0)
+    headingRef.current?.focus({ preventScroll: true })
+  }, [])
 
   const filtered = passengers.filter((passenger) => matchesPassengerSearch(passenger, query))
 
@@ -66,26 +40,13 @@ export function PassengersPage() {
       <section aria-labelledby="passengers-page-title" className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-subtle">Pessoas</p>
-          <h2 id="passengers-page-title" className="mt-2 text-2xl font-bold tracking-[-0.035em] sm:text-3xl">Passageiros</h2>
+          <h2 ref={headingRef} tabIndex={-1} id="passengers-page-title" className="mt-2 text-2xl font-bold tracking-[-0.035em] focus-visible:rounded-control focus-visible:outline-2 focus-visible:outline-primary sm:text-3xl">Passageiros</h2>
           <p className="mt-2 leading-7 text-muted">Cadastre passageiros e consulte seus dados, mesmo offline.</p>
         </div>
-        <Button disabled={isLoading || Boolean(error) || Boolean(formState)} onClick={(event) => {
-          triggerRef.current = event.currentTarget
-          setMessage(null)
-          setFormState({})
-        }}><Plus aria-hidden="true" size={17} />Novo passageiro</Button>
+        <Link to="/passengers/new" className="inline-flex min-h-11 max-w-full items-center justify-center gap-2 rounded-control bg-primary px-4 py-2 text-sm font-semibold text-on-primary! shadow-control hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"><Plus aria-hidden="true" size={17} />Novo passageiro</Link>
       </section>
 
-      {message && <p role="status" className="mt-4 text-sm text-success">{message}</p>}
       {error && <p role="alert" className="mt-4 text-sm text-danger">{error}</p>}
-
-      {formState && (
-        <Card className="mt-6" padding="lg">
-          <h3 ref={formHeadingRef} className="mb-5 text-lg font-semibold">{formState.passenger ? 'Editar passageiro' : 'Novo passageiro'}</h3>
-          <PassengerForm key={formState.passenger?.id ?? 'create'} passenger={formState.passenger}
-            isSubmitting={isSubmitting} onSubmit={handleSubmit} onCancel={closeForm} />
-        </Card>
-      )}
 
       <div className="mt-6">
         <label htmlFor="passenger-search" className="text-sm font-semibold">Buscar passageiros</label>
@@ -108,13 +69,8 @@ export function PassengersPage() {
                   <h3 className="break-words font-semibold">{passenger.name}</h3>
                   <p className="mt-1 break-words text-xs text-subtle">No mapa: {resolvePassengerDisplayName(passenger)}</p>
                   {passenger.phone && <p className="mt-1 break-words text-sm text-muted">{passenger.phone}</p>}
-                  {passenger.notes && <p className="mt-2 line-clamp-2 break-words text-sm leading-6 text-subtle">{passenger.notes}</p>}
-                  <Button variant="secondary" size="sm" className="mt-4" disabled={Boolean(formState)}
-                    aria-label={`Editar ${passenger.name}`} onClick={(event) => {
-                      triggerRef.current = event.currentTarget
-                      setMessage(null)
-                      setFormState({ passenger })
-                    }}>Editar</Button>
+                  <Link to={`/passengers/${encodeURIComponent(passenger.id)}`} aria-label={`Ver detalhes de ${passenger.name}`}
+                    className="mt-4 inline-flex min-h-11 items-center justify-center rounded-control border border-border bg-surface-raised px-3.5 py-2 text-sm font-semibold text-foreground! shadow-soft hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">Ver passageiro</Link>
                 </Card>
               </li>
             ))}

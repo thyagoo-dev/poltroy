@@ -10,6 +10,9 @@ import { MapPage } from '@/pages/map/MapPage'
 import { MorePage } from '@/pages/more/MorePage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { PassengersPage } from '@/pages/passengers/PassengersPage'
+import { PassengerCreatePage } from '@/pages/passengers/PassengerCreatePage'
+import { PassengerDetailsPage } from '@/pages/passengers/PassengerDetailsPage'
+import { PassengerEditPage } from '@/pages/passengers/PassengerEditPage'
 import { TripsPage } from '@/pages/trips/TripsPage'
 
 export function AppRouter() {
@@ -36,6 +39,10 @@ export function AppRouter() {
             path="passengers"
             element={<PassengersPage />}
           />
+
+          <Route path="passengers/new" element={<PassengerCreatePage />} />
+          <Route path="passengers/:passengerId" element={<PassengerDetailsPage />} />
+          <Route path="passengers/:passengerId/edit" element={<PassengerEditPage />} />
 
           <Route
             path="more"

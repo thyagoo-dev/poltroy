@@ -106,3 +106,7 @@ A aba Mapa é um workspace operacional único: sem viagem selecionada, apresenta
 ## Passenger Data v2 — Refino 15.4
 
 Passageiros novos exigem nome completo e nome de exibição de até 16 pontos de código Unicode. CPF/RG são opcionais; CPF usa máscara na UI e dígitos no armazenamento. Registros legados usam os primeiros 16 caracteres do nome completo como fallback de apresentação, sem gravação automática. O schema Dexie permanece v1. Backups novos são v2, com importação de v1 convertida em memória e IDs/associações preservados.
+
+## Navegação de passageiros — Refino 15.5
+
+A listagem `/passengers` reúne busca e acesso aos cadastros. Criação e edição usam páginas dedicadas (`/passengers/new` e `/passengers/:passengerId/edit`); após salvar, abrem os detalhes em `/passengers/:passengerId`. Identificação aparece somente nos detalhes e na edição. As subrotas também funcionam offline após o cache da aplicação estar disponível.
