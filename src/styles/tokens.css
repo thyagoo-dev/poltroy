@@ -3,37 +3,38 @@
    * Colors
    */
 
-  --poltroy-color-background: #071014;
+  --poltroy-color-background: #f8fafc;
 
-  --poltroy-color-surface: #0d191e;
-  --poltroy-color-surface-raised: #102128;
-  --poltroy-color-surface-soft: #14272e;
+  --poltroy-color-surface: #ffffff;
+  --poltroy-color-surface-raised: #ffffff;
+  --poltroy-color-surface-soft: #f1f5f9;
 
-  --poltroy-color-border: #1c3239;
-  --poltroy-color-border-strong: #2c4952;
+  --poltroy-color-border: #e2e8f0;
+  --poltroy-color-border-strong: #cbd5e1;
 
-  --poltroy-color-foreground: #edf7f8;
-  --poltroy-color-muted: #9eb1b7;
-  --poltroy-color-subtle: #72878e;
+  --poltroy-color-foreground: #0f172a;
+  --poltroy-color-muted: #475569;
+  /* Tertiary text and placeholders retain AA contrast on surface-soft. */
+  --poltroy-color-subtle: #5f6f85;
 
-  --poltroy-color-primary: #55ded7;
-  --poltroy-color-primary-hover: #6be7e0;
-  --poltroy-color-primary-pressed: #3fcac4;
-  --poltroy-color-on-primary: #051416;
+  --poltroy-color-primary: #2563eb;
+  --poltroy-color-primary-hover: #1d4ed8;
+  --poltroy-color-primary-pressed: #1e40af;
+  --poltroy-color-on-primary: #ffffff;
 
-  --poltroy-color-success: #5dd6a4;
-  --poltroy-color-warning: #f2c25d;
-  --poltroy-color-danger: #ff7b7f;
-  --poltroy-color-reserved: #f2a45b;
+  --poltroy-color-success: #166534;
+  --poltroy-color-warning: #92400e;
+  --poltroy-color-danger: #b91c1c;
+  --poltroy-color-reserved: #92400e;
 
   /*
    * Seat states
    */
 
-  --poltroy-color-seat-free: #82969d;
-  --poltroy-color-seat-occupied: #ff768f;
-  --poltroy-color-seat-reserved: #f2a45b;
-  --poltroy-color-seat-blocked: #667982;
+  --poltroy-color-seat-free: #475569;
+  --poltroy-color-seat-occupied: #be123c;
+  --poltroy-color-seat-reserved: #92400e;
+  --poltroy-color-seat-blocked: #334155;
 
   /*
    * Spacing
@@ -63,16 +64,14 @@
    */
 
   --poltroy-shadow-soft:
-    0 16px 45px rgb(0 0 0 / 18%),
-    inset 0 1px 0 rgb(255 255 255 / 3%);
+    0 1px 2px rgb(15 23 42 / 4%),
+    0 4px 12px rgb(15 23 42 / 6%);
 
   --poltroy-shadow-raised:
-    0 22px 60px rgb(0 0 0 / 24%),
-    inset 0 1px 0 rgb(255 255 255 / 4%);
+    0 8px 24px rgb(15 23 42 / 8%);
 
   --poltroy-shadow-control:
-    0 8px 20px rgb(0 0 0 / 16%),
-    inset 0 1px 0 rgb(255 255 255 / 8%);
+    0 1px 3px rgb(15 23 42 / 8%);
 
   /*
    * Typography

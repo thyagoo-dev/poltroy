@@ -183,7 +183,7 @@ export function SeatStatusSheet({
                     'transition-[border-color,background-color]',
                     'focus-visible:outline-none',
                     'focus-visible:ring-2',
-                    'focus-visible:ring-primary/55',
+                    'focus-visible:ring-primary',
                     'disabled:cursor-wait disabled:opacity-60',
                     selected
                       ? visual.className

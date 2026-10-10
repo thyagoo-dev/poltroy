@@ -25,10 +25,10 @@ export function DesktopNavigation() {
                 'transition-[background-color,color]',
                 'duration-150 ease-out',
                 'focus-visible:outline-none',
-                'focus-visible:ring-2 focus-visible:ring-primary/55',
+                'focus-visible:ring-2 focus-visible:ring-primary',
                 'motion-reduce:transition-none',
                 isActive
-                  ? 'bg-primary/10 text-primary!'
+                  ? 'bg-primary/5 text-primary!'
                   : 'text-muted! hover:bg-surface-soft hover:text-foreground!',
               )
             }

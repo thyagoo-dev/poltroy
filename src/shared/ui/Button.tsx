@@ -50,7 +50,7 @@ export function Button({
         'transition-[background-color,border-color,color,box-shadow,transform]',
         'duration-150 ease-out',
         'focus-visible:outline-none focus-visible:ring-2',
-        'focus-visible:ring-primary/55',
+        'focus-visible:ring-primary',
         'focus-visible:ring-offset-2 focus-visible:ring-offset-background',
         'active:translate-y-px',
         'disabled:pointer-events-none disabled:opacity-45',

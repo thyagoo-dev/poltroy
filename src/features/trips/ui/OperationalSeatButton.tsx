@@ -72,7 +72,7 @@ export function OperationalSeatButton({
         'hover:-translate-y-0.5',
         'focus-visible:outline-none',
         'focus-visible:ring-2',
-        'focus-visible:ring-primary/60',
+        'focus-visible:ring-primary',
         'focus-visible:ring-offset-2',
         'focus-visible:ring-offset-surface',
         visual.className,

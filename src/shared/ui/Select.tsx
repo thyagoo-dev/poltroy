@@ -19,9 +19,9 @@ export function Select({
         'text-sm text-foreground',
         'outline-none',
         'transition-[border-color,box-shadow]',
-        'focus:border-primary/60',
-        'focus:ring-2 focus:ring-primary/15',
-        'disabled:cursor-not-allowed disabled:opacity-50',
+        'focus:border-primary',
+        'focus:ring-2 focus:ring-primary',
+        'disabled:cursor-not-allowed disabled:bg-surface-soft disabled:text-muted',
         className,
       )}
       {...props}

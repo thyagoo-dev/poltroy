@@ -50,7 +50,7 @@ export function PassengerForm({ passenger, isSubmitting, onSubmit, onCancel }: P
       <div>
         <label htmlFor={`${id}-notes`} className="text-sm font-semibold">Observações</label>
         <textarea id={`${id}-notes`} rows={3} disabled={isSubmitting}
-          className="mt-2 min-h-24 w-full resize-y rounded-control border border-border bg-surface-raised px-3.5 py-3 text-sm text-foreground outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/15 disabled:opacity-50"
+          className="mt-2 min-h-24 w-full resize-y rounded-control border border-border bg-surface-raised px-3.5 py-3 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary disabled:bg-surface-soft disabled:text-muted"
           value={notes} onChange={(event) => setNotes(event.target.value)} />
       </div>
       {error && <p id={`${id}-error`} role="alert" className="rounded-control border border-danger/20 bg-danger/10 px-3 py-2.5 text-sm text-danger">{error}</p>}

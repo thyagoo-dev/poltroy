@@ -90,3 +90,7 @@ Os mapas preservam CSS Grid e células entre 44 e 56 px. Os presets de 44, 40 e 
 Header, navegação, sidebar e dialogs respeitam safe areas. Dialogs e a prévia de backup têm scroll próprio limitado pela altura dinâmica (dvh). A adaptação usa CSS/Tailwind, sem estado JavaScript de viewport ou detecção de dispositivo. A ordem visual das ações acompanha a ordem do teclado.
 
 Os tokens de altura do header e de espaço reservado à navegação também definem o scroll-padding do documento. O scroll nativo de foco considera essas áreas, inclusive com viewport reduzido; campos maiores, como textareas, continuam acessíveis pelo scroll natural, sem detectar o teclado em JavaScript.
+
+## Identidade visual — Refino 15.1
+
+O POLTROY utiliza Light Mode como tema único: fundo slate-50 (#F8FAFC), superfícies brancas e primary blue-600 (#2563EB). Cores, bordas e sombras são centralizadas em tokens semânticos; textos terciários e status usam tons com contraste adequado. A navegação floating, os layouts responsivos e os fluxos offline permanecem preservados.

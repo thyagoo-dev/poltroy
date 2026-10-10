@@ -600,7 +600,7 @@ export function BusesPage() {
                             <span
                               className="
                                 rounded-pill
-                                bg-primary/10
+                                bg-primary/5
                                 px-2 py-1
                                 text-[0.625rem]
                                 font-bold

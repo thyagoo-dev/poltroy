@@ -307,7 +307,7 @@ export function MapPage() {
                 hover:bg-primary-hover
                 focus-visible:outline-none
                 focus-visible:ring-2
-                focus-visible:ring-primary/55
+                focus-visible:ring-primary
               "
             >
               <Plus

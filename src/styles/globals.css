@@ -12,7 +12,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 *,
@@ -49,13 +49,7 @@ body {
 
   color: var(--poltroy-color-foreground);
 
-  background:
-    radial-gradient(
-      circle at 50% -10%,
-      rgb(67 185 182 / 11%),
-      transparent 35rem
-    ),
-    var(--poltroy-color-background);
+  background: var(--poltroy-color-background);
 }
 
 #root {

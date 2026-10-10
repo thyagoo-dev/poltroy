@@ -336,7 +336,7 @@ export function TripForm({
 
           <Input
             id="trip-departure"
-            className="mt-2 focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/15"
+            className="mt-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary"
             type="datetime-local"
             value={departureAt}
             onChange={(event) =>
@@ -357,7 +357,7 @@ export function TripForm({
 
           <Input
             id="trip-arrival"
-            className="mt-2 focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/15"
+            className="mt-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary"
             type="datetime-local"
             value={
               arrivalEstimateAt
@@ -396,9 +396,9 @@ export function TripForm({
             outline-none
             placeholder:text-subtle
             transition-[border-color,box-shadow]
-            focus:border-primary/60
+            focus:border-primary
             focus:ring-2
-            focus:ring-primary/15
+            focus:ring-primary
           "
           value={notes}
           onChange={(event) =>

@@ -22,7 +22,7 @@ export function OperationalTripPanel({ trip, bus, layout, pendingAction, error, 
       <section aria-label="Viagem operacional" aria-busy={pendingAction !== null}>
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="min-w-0 break-words text-lg font-semibold">{trip.origin} → {trip.destination}</h3>
-          <span className="rounded-pill border border-primary/20 bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
+          <span className="rounded-pill border border-primary/20 bg-primary/5 px-2 py-1 text-xs font-semibold text-primary">
             {trip.status === 'ACTIVE' ? 'Em andamento' : 'Planejada'}
           </span>
         </div>

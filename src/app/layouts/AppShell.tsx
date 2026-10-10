@@ -96,7 +96,7 @@ export function AppShell() {
         className="
           hidden
           border-r border-border
-          bg-surface/55
+          bg-surface
           lg:sticky lg:top-0 lg:flex lg:h-dvh
           lg:flex-col lg:overflow-y-auto
           pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]
@@ -120,7 +120,7 @@ export function AppShell() {
           </div>
 
           <div className="min-w-0">
-            <p className="font-bold tracking-[-0.02em]">
+            <p className="font-bold tracking-[-0.02em] text-primary">
               Poltroy
             </p>
 
@@ -167,9 +167,8 @@ export function AppShell() {
           className="
             sticky top-0 z-[var(--poltroy-z-sticky)]
             border-b border-border
-            bg-background/90
+            bg-surface
             pt-[env(safe-area-inset-top)]
-            backdrop-blur-xl
           "
         >
           <div
@@ -222,7 +221,7 @@ export function AppShell() {
                 hover:bg-surface-raised
                 focus-visible:outline-none
                 focus-visible:ring-2
-                focus-visible:ring-primary/55
+                focus-visible:ring-primary
                 sm:max-w-[18rem]
               "
               aria-label={`Gerenciar ônibus. Selecionado: ${activeBusLabel}`}

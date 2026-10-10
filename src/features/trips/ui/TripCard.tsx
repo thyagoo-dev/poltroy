@@ -44,7 +44,7 @@ const statusClasses:
     string
   > = {
   PLANNED:
-    'border-primary/20 bg-primary/10 text-primary',
+    'border-primary/20 bg-primary/5 text-primary',
 
   ACTIVE:
     'border-success/20 bg-success/10 text-success',
