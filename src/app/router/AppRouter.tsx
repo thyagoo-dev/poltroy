@@ -1,3 +1,4 @@
+import { lazy } from 'react'
 import {
   BrowserRouter,
   Route,
@@ -5,19 +6,20 @@ import {
 } from 'react-router'
 
 import { AppShell } from '@/app/layouts/AppShell'
-import { BusesPage } from '@/pages/buses/BusesPage'
 import { MapPage } from '@/pages/map/MapPage'
-import { MorePage } from '@/pages/more/MorePage'
-import { MoreAppPage } from '@/pages/more/MoreAppPage'
-import { MoreBackupPage } from '@/pages/more/MoreBackupPage'
-import { MoreSettingsPage } from '@/pages/more/MoreSettingsPage'
-import { MoreAboutPage } from '@/pages/more/MoreAboutPage'
-import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
-import { PassengersPage } from '@/pages/passengers/PassengersPage'
-import { PassengerCreatePage } from '@/pages/passengers/PassengerCreatePage'
-import { PassengerDetailsPage } from '@/pages/passengers/PassengerDetailsPage'
-import { PassengerEditPage } from '@/pages/passengers/PassengerEditPage'
-import { TripsPage } from '@/pages/trips/TripsPage'
+
+const BusesPage = lazy(() => import('@/pages/buses/BusesPage').then((module) => ({ default: module.BusesPage })))
+const TripsPage = lazy(() => import('@/pages/trips/TripsPage').then((module) => ({ default: module.TripsPage })))
+const PassengersPage = lazy(() => import('@/pages/passengers/passenger-pages').then((module) => ({ default: module.PassengersPage })))
+const PassengerCreatePage = lazy(() => import('@/pages/passengers/passenger-pages').then((module) => ({ default: module.PassengerCreatePage })))
+const PassengerDetailsPage = lazy(() => import('@/pages/passengers/passenger-pages').then((module) => ({ default: module.PassengerDetailsPage })))
+const PassengerEditPage = lazy(() => import('@/pages/passengers/passenger-pages').then((module) => ({ default: module.PassengerEditPage })))
+const MorePage = lazy(() => import('@/pages/more/more-pages').then((module) => ({ default: module.MorePage })))
+const MoreAppPage = lazy(() => import('@/pages/more/more-pages').then((module) => ({ default: module.MoreAppPage })))
+const MoreBackupPage = lazy(() => import('@/pages/more/MoreBackupPage').then((module) => ({ default: module.MoreBackupPage })))
+const MoreSettingsPage = lazy(() => import('@/pages/more/more-pages').then((module) => ({ default: module.MoreSettingsPage })))
+const MoreAboutPage = lazy(() => import('@/pages/more/more-pages').then((module) => ({ default: module.MoreAboutPage })))
+const NotFoundPage = lazy(() => import('@/pages/not-found/NotFoundPage').then((module) => ({ default: module.NotFoundPage })))
 
 export function AppRouter() {
   return (

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import {
   BusFront,
   Circle,
@@ -6,12 +6,13 @@ import {
 } from 'lucide-react'
 import {
   Link,
-  Outlet,
   useLocation,
 } from 'react-router'
 
 import { useActiveBus } from '@/app/hooks/use-active-bus'
 import { getShellBusContext } from '@/app/layouts/shell-route-context'
+import { RouteContent } from '@/app/router/RouteContent'
+import { RouteLoadingFallback } from '@/app/router/RouteLoadingFallback'
 import {
   DesktopNavigation,
   MobileNavigation,
@@ -55,11 +56,9 @@ export function AppShell() {
   }, [location.pathname])
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-    // Preserve intentional field autofocus and the existing asynchronous page focus.
-    if (mainRef.current?.contains(document.activeElement) && document.activeElement !== mainRef.current) return
-    const target = mainRef.current?.querySelector<HTMLElement>('h2[tabindex="-1"]') ?? headingRef.current
-    target?.focus({ preventScroll: true })
+    // A contextual link can disappear while the next route is suspended.
+    // Repair lost focus without interrupting a surviving navigation control.
+    if (document.activeElement === document.body) headingRef.current?.focus({ preventScroll: true })
   }, [location.pathname, location.key])
 
   const activeBusLabel =
@@ -243,7 +242,9 @@ export function AppShell() {
         >
           <OfflineStatus />
           <PwaUpdatePrompt />
-          <Outlet />
+          <Suspense key={location.key} fallback={<RouteLoadingFallback />}>
+            <RouteContent mainRef={mainRef} headingRef={headingRef} />
+          </Suspense>
         </main>
 
         <MobileNavigation />
