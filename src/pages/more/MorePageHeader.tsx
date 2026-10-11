@@ -6,9 +6,11 @@ interface MorePageHeaderProps {
   title: string
   description: string
   showBack?: boolean
+  backTo?: string
+  backLabel?: string
 }
 
-export function MorePageHeader({ title, description, showBack = true }: MorePageHeaderProps) {
+export function MorePageHeader({ title, description, showBack = true, backTo = '/more', backLabel = 'Mais' }: MorePageHeaderProps) {
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -17,8 +19,8 @@ export function MorePageHeader({ title, description, showBack = true }: MorePage
 
   return (
     <>
-      {showBack && <Link to="/more" className="mb-4 inline-flex min-h-11 max-w-full items-center gap-2 rounded-control px-2 text-sm font-semibold text-primary! hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
-        <ArrowLeft aria-hidden="true" className="shrink-0" size={17} />Mais
+      {showBack && <Link to={backTo} className="mb-4 inline-flex min-h-11 max-w-full items-center gap-2 rounded-control px-2 text-sm font-semibold text-primary! hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+        <ArrowLeft aria-hidden="true" className="shrink-0" size={17} />{backLabel}
       </Link>}
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-subtle">Sistema</p>
       <h2 ref={heading} tabIndex={-1} className="mt-2 break-words text-2xl font-bold tracking-[-0.035em] focus-visible:rounded-control focus-visible:outline-2 focus-visible:outline-primary sm:text-3xl">{title}</h2>

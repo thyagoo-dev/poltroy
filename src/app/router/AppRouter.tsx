@@ -20,6 +20,8 @@ const MoreBackupPage = lazy(() => import('@/pages/more/MoreBackupPage').then((mo
 const MoreSettingsPage = lazy(() => import('@/pages/more/more-pages').then((module) => ({ default: module.MoreSettingsPage })))
 const MoreAboutPage = lazy(() => import('@/pages/more/more-pages').then((module) => ({ default: module.MoreAboutPage })))
 const NotFoundPage = lazy(() => import('@/pages/not-found/NotFoundPage').then((module) => ({ default: module.NotFoundPage })))
+const HistoryPage = lazy(() => import('@/pages/more/history/history-pages').then((module) => ({ default: module.HistoryPage })))
+const HistoryDetailsPage = lazy(() => import('@/pages/more/history/history-pages').then((module) => ({ default: module.HistoryDetailsPage })))
 
 export function AppRouter() {
   return (
@@ -59,6 +61,8 @@ export function AppRouter() {
           <Route path="more/backup" element={<MoreBackupPage />} />
           <Route path="more/settings" element={<MoreSettingsPage />} />
           <Route path="more/about" element={<MoreAboutPage />} />
+          <Route path="more/history" element={<HistoryPage />} />
+          <Route path="more/history/:tripId" element={<HistoryDetailsPage />} />
 
           <Route
             path="*"

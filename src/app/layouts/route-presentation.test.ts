@@ -10,6 +10,8 @@ describe('route presentation', () => {
     ['/missing', 'Página não encontrada'], ['/more/missing', 'Página não encontrada'],
     ['/passengers/id/missing', 'Página não encontrada'],
     ['/more/backup/', 'Backup e restauração'], ['/passengers/id/edit/', 'Editar passageiro'],
+    ['/more/history', 'Histórico operacional'], ['/more/history/id', 'Histórico da viagem'],
+    ['/more/history/id/', 'Histórico da viagem'], ['/more/history/id/extra', 'Página não encontrada'],
   ])('provides a specific title for %s', (path, title) => {
     expect(getRoutePresentation(path).documentTitle).toBe(`${title} — Poltroy`)
   })
@@ -20,6 +22,8 @@ describe('route presentation', () => {
   it('preserves shell section names for valid subroutes', () => {
     expect(getRoutePresentation('/more/backup').sectionTitle).toBe('Mais')
     expect(getRoutePresentation('/passengers/new').sectionTitle).toBe('Passageiros')
+    expect(getRoutePresentation('/more/history').sectionTitle).toBe('Mais')
+    expect(getRoutePresentation('/more/history/id').sectionTitle).toBe('Mais')
   })
   it('decodes a details id without fetching new/edit/invalid routes', () => {
     expect(getPassengerTitleId('/passengers/a%20b')).toBe('a b')

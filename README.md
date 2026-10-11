@@ -125,6 +125,16 @@ A listagem `/passengers` reúne busca e acesso aos cadastros. Criação e ediç�
 
 `/more` reúne os links para Aplicativo (`/more/app`), Backup e restauração (`/more/backup`), Configurações (`/more/settings`) e Sobre (`/more/about`). Instalação PWA e backup têm páginas próprias; Configurações informa que ainda não há preferências configuráveis. As subrotas funcionam offline após o cache da aplicação estar disponível.
 
+## Histórico operacional — Etapa 18
+
+Em **Mais → Histórico operacional**, consulte viagens concluídas ou canceladas, com busca por rota, ônibus, nome completo, nome de exibição ou poltrona. O detalhe mostra os metadados, a ocupação final, os passageiros e um mapa somente de leitura do layout associado à viagem. A consulta funciona offline após o precache da aplicação.
+
+O histórico é uma projeção das entidades existentes, sem cópia ou nova store. Não é um audit log imutável: Passenger e Bus continuam cadastros vivos, e seus nomes atuais podem aparecer em viagens encerradas. Não são criados snapshots de nomes ou documentos. CPF, RG e telefone não são apresentados nem pesquisados no histórico.
+
+Estados de assentos repetidos são consolidados por updatedAt e ID, sem escrita. Estados de outra viagem ou sem poltrona válida não entram na ocupação; referências de passageiros ausentes não entram na contagem de passageiros únicos. Associações de poltronas ausentes continuam visíveis no detalhe como “Poltrona indisponível”. Layout ausente ou de outro ônibus impede apenas a exibição do mapa/resumo. Dexie permanece v1, e backup v2/importação v1 permanecem intactos.
+
+A seção histórica atual de `/trips` continua disponível e coexiste com esta consulta dedicada. Uma eventual consolidação dessa navegação exige decisão futura; esta etapa não redesenha Viagens.
+
 ## Shell e contexto de ônibus — Refino 15.7
 
 O header mostra o ônibus selecionado em Mapa e Viagens como link para a Frota; em `/buses`, apresenta um indicador sem navegação redundante. Passageiros, Mais, suas subrotas e páginas não encontradas não exibem esse contexto. O header permanece `sticky`, com safe area e tokens de altura preservados; seu topo foi validado durante a rolagem longa no preview de produção.

@@ -1,10 +1,11 @@
-import { ChevronRight, DatabaseBackup, Info, Settings, Smartphone } from 'lucide-react'
+import { ChevronRight, DatabaseBackup, History, Info, Settings, Smartphone } from 'lucide-react'
 import { Link } from 'react-router'
 
 import { MorePageHeader } from '@/pages/more/MorePageHeader'
 import { Card } from '@/shared/ui/Card'
 
 const sections = [
+  { path: '/more/history', title: 'Histórico operacional', description: 'Consulte viagens encerradas e ocupação final', icon: History },
   { path: '/more/app', title: 'Aplicativo', description: 'Instalação e uso offline', icon: Smartphone },
   { path: '/more/backup', title: 'Backup e restauração', description: 'Proteja seus dados locais', icon: DatabaseBackup },
   { path: '/more/settings', title: 'Configurações', description: 'Preferências do aplicativo', icon: Settings },
