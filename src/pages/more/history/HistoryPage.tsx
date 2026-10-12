@@ -5,7 +5,9 @@ import type { TripHistorySummary } from '@/features/trips/application/trip-histo
 import { filterTripHistory, type TripHistoryFilter } from '@/features/trips/application/trip-history-search'
 import { MorePageHeader } from '@/pages/more/MorePageHeader'
 import { HistoryOccupancy, HistoryStatus } from './HistoryTripSummary'
-import { formatHistoryEnd } from './format-history-end'
+import { formatHistoryEnd } from '@/features/trips/application/format-history-end'
+import { createTripHistoryCsv } from '@/features/exports/application/trip-history-csv'
+import { CsvExportButton } from '@/features/exports/ui/CsvExportButton'
 import { formatDateTime } from '@/shared/lib/date-time'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
@@ -36,6 +38,7 @@ export function HistoryPage() {
       <div role="group" aria-label="Filtrar histórico por status" className="mt-4 flex flex-wrap gap-2">
         {filters.map(({ value, label }) => <Button key={value} variant={filter === value ? 'primary' : 'secondary'} aria-pressed={filter === value} onClick={() => setFilter(value)}>{label}</Button>)}
       </div>
+      <CsvExportButton label="Exportar CSV" successMessage="CSV exportado." disabled={loading || error || visible.length === 0} createFile={(clock) => createTripHistoryCsv(visible, clock)} />
       {loading ? <p role="status" className="mt-6 text-sm text-muted">Carregando histórico...</p>
         : error ? <p role="alert" className="mt-6 text-sm text-danger">Não foi possível carregar o histórico.</p>
           : <>

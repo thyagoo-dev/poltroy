@@ -1,4 +1,4 @@
-import { getHistoryEndedAt, type HistoricalTrip } from '@/features/trips/application/trip-history'
+import { getHistoryEndedAt, type HistoricalTrip } from './trip-history'
 import { formatDateTime } from '@/shared/lib/date-time'
 
 export function formatHistoryEnd(trip: HistoricalTrip) {

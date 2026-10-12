@@ -135,6 +135,12 @@ Estados de assentos repetidos são consolidados por updatedAt e ID, sem escrita.
 
 A seção histórica atual de `/trips` continua disponível e coexiste com esta consulta dedicada. Uma eventual consolidação dessa navegação exige decisão futura; esta etapa não redesenha Viagens.
 
+## Exportações CSV locais — Etapa 19
+
+No histórico, **Exportar CSV** baixa somente as viagens da busca e filtro atuais; no detalhe, **Exportar manifesto CSV** inclui todas as poltronas e estados conhecidos, inclusive referências ausentes. A geração e o download são locais e funcionam offline. Os arquivos usam separador `;`, UTF-8 com BOM, CRLF e células entre aspas, com neutralização de fórmulas de planilha por prefixo de apóstrofo.
+
+Os relatórios não incluem documentos, telefone, observações de Passenger ou de Trip. Nomes de passageiros associados aparecem somente no manifesto. CSV não substitui backup e não é audit log: Passenger e Bus continuam cadastros vivos. PDF e XLSX não estão disponíveis nesta etapa.
+
 ## Shell e contexto de ônibus — Refino 15.7
 
 O header mostra o ônibus selecionado em Mapa e Viagens como link para a Frota; em `/buses`, apresenta um indicador sem navegação redundante. Passageiros, Mais, suas subrotas e páginas não encontradas não exibem esse contexto. O header permanece `sticky`, com safe area e tokens de altura preservados; seu topo foi validado durante a rolagem longa no preview de produção.

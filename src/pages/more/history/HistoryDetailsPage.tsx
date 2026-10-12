@@ -9,7 +9,9 @@ import { HistoricalSeatView } from '@/features/trips/ui/HistoricalSeatView'
 import { BusMap } from '@/features/seat-map/ui/BusMap'
 import { MorePageHeader } from '@/pages/more/MorePageHeader'
 import { HistoryOccupancy, HistoryStatus } from './HistoryTripSummary'
-import { formatHistoryEnd } from './format-history-end'
+import { formatHistoryEnd } from '@/features/trips/application/format-history-end'
+import { createTripManifestCsv } from '@/features/exports/application/trip-history-csv'
+import { CsvExportButton } from '@/features/exports/ui/CsvExportButton'
 import { formatDateTime } from '@/shared/lib/date-time'
 import { Card } from '@/shared/ui/Card'
 
@@ -40,6 +42,7 @@ function HistoryDetailsContent({ tripId }: { tripId?: string }) {
       {result.status === 'notFound' && <p className="mt-6 font-semibold">Viagem não encontrada</p>}
       {result.status === 'notHistorical' && <p className="mt-6 text-sm text-muted">Esta viagem ainda não faz parte do histórico.</p>}
       {details && trip && <>
+        <CsvExportButton label="Exportar manifesto CSV" successMessage="Manifesto exportado." createFile={(clock) => createTripManifestCsv(details, clock)} />
         <Card className="mt-6">
           <h3 className="break-words text-xl font-semibold">{trip.origin} → {trip.destination}</h3>
           <div className="mt-3"><HistoryStatus status={trip.status} /></div>
